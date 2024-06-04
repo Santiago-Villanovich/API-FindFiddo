@@ -13,9 +13,11 @@ namespace FindFiddo.Repository
     public class UserRepository : IUserRepository
     {
         UserContext _ctx;
-        public UserRepository() 
-        { 
-            _ctx = new UserContext();
+        private readonly IConfiguration _configuration;
+        public UserRepository(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _ctx = new UserContext(configuration);
         }
 
         public void DeleteById(int id)
@@ -50,7 +52,7 @@ namespace FindFiddo.Repository
 
         public User signUP(User user)
         {
-            return _ctx.signUP(user);   
+            return _ctx.signUP(user);
         }
     }
 }

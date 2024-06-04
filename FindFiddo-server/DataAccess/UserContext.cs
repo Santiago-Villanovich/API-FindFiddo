@@ -1,16 +1,11 @@
 ﻿using FindFiddo.Abstractions;
 using FindFiddo.Entities;
-using System;
-using System.Configuration;
 using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Net;
-using FindFiddo.Services;
+
 
 namespace FindFiddo.DataAccess
 {
-    public interface IUserContext: ICrud<User>
+    public interface IUserContext : ICrud<User>
     {
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
@@ -19,11 +14,10 @@ namespace FindFiddo.DataAccess
     public class UserContext : IUserContext
     {
         private SqlConnection _conn;
-
-        public UserContext()
+        private readonly IConfiguration _config;
+        public UserContext(IConfiguration configuration)
         {
-            
-            _conn = new SqlConnection("Data Source=.;Initial Catalog=FindFiddo_App;Integrated Security=True;TrustServerCertificate=True");
+            _config = configuration;
         }
 
         public void DeleteById(int id)
@@ -45,9 +39,10 @@ namespace FindFiddo.DataAccess
         {
             try
             {
+                _conn = new SqlConnection(_config.GetConnectionString("default"));
                 User user = null;
 
-                using SqlCommand cmd = new SqlCommand("GetUserByEmail",_conn);
+                using SqlCommand cmd = new SqlCommand("GetUserByEmail", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@email", email);
@@ -57,7 +52,7 @@ namespace FindFiddo.DataAccess
 
                 while (reader.Read())
                 {
-                    user = new User();
+                    user = new();
                     user.Id = reader.GetGuid(reader.GetOrdinal("id_usuario"));
                     user.nombres = (string)reader["nombres"];
                     user.apellidos = (string)reader["apellidos"];
@@ -76,7 +71,8 @@ namespace FindFiddo.DataAccess
             catch (Exception)
             {
                 throw;
-            }finally { _conn.Close(); }
+            }
+            finally { _conn.Close(); }
         }
 
         public List<Rol> GetUserRols(Guid idUsuario)
@@ -154,7 +150,7 @@ namespace FindFiddo.DataAccess
                 {
                     throw new Exception("Ya se encuentra registrado un usuario con el mail");
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -164,7 +160,7 @@ namespace FindFiddo.DataAccess
             {
                 _conn.Close();
             }
-            
+
         }
     }
 }

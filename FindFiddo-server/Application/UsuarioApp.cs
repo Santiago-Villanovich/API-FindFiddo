@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using FindFiddo.Abstractions;
+﻿using FindFiddo.Abstractions;
 using FindFiddo.Entities;
 using FindFiddo.Repository;
 using FindFiddo.Services;
 
 namespace FindFiddo.Application
 {
-    public interface IUsuarioApp: ICrud<User>
+    public interface IUsuarioApp : ICrud<User>
     {
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
@@ -21,9 +15,9 @@ namespace FindFiddo.Application
     public class UsuarioApp : IUsuarioApp
     {
         UserRepository _repo;
-        public UsuarioApp() 
+        public UsuarioApp(IConfiguration configuration)
         {
-            _repo = new UserRepository();
+            _repo = new UserRepository(configuration);
         }
 
 
@@ -68,7 +62,7 @@ namespace FindFiddo.Application
             user.DV = DigitoVerificador.CalcularDV(user);
 
             user.salt = EncryptService.GenerateSalt();
-            user.password = EncryptService.Compute(user.password,user.salt);
+            user.password = EncryptService.Compute(user.password, user.salt);
 
             return _repo.signUP(user);
         }
