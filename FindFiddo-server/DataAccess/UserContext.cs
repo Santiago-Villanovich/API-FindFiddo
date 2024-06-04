@@ -126,7 +126,7 @@ namespace FindFiddo.DataAccess
                 user.DV= DigitoVerificador.CalcularDV(user);
                 using SqlCommand cmd = new SqlCommand("sp_InsertUser", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id_usuario",user.Id);
+                //cmd.Parameters.AddWithValue("@id_usuario",user.Id);
                 cmd.Parameters.AddWithValue("@id_rol", user.rol.Id);
                 cmd.Parameters.AddWithValue("@nombres", user.nombres);
                 cmd.Parameters.AddWithValue("@apellidos", user.apellidos);
@@ -146,11 +146,12 @@ namespace FindFiddo.DataAccess
 
                 _conn.Open();
                 cmd.ExecuteNonQuery();
-                return 
-            }
-            catch (Exception)
-            {
 
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {

@@ -55,7 +55,8 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                var user = 
+                User UsuarioNew = _user.SignUP(user);
+                return Ok(UsuarioNew);
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
