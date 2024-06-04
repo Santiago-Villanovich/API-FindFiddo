@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
+﻿using FindFiddo.Application;
 using FindFiddo.Entities;
-using FindFiddo.Application;
-using FindFiddo.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace FindFiddo_Server.Controllers
@@ -14,14 +11,13 @@ namespace FindFiddo_Server.Controllers
     public class FindFiddoController : ControllerBase
     {
         private readonly ILogger<FindFiddoController> _logger;
-        private readonly IConfiguration _config;
-        private UsuarioApp _user; 
+
+        private UsuarioApp _user;
 
         public FindFiddoController(IConfiguration config, ILogger<FindFiddoController> logger)
         {
-            _config = config;
             _logger = logger;
-            _user = new UsuarioApp();
+            _user = new UsuarioApp(config);
         }
 
         [AllowAnonymous]
@@ -59,12 +55,13 @@ namespace FindFiddo_Server.Controllers
                 User UsuarioNew = _user.SignUP(user);
                 return Ok(UsuarioNew);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        
+
     }
 }
