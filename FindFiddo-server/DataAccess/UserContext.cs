@@ -15,6 +15,12 @@ namespace FindFiddo.DataAccess
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         User signUP(User user);
+
+        IList<User> GetAllUsuarios();
+
+        bool UpdateDVuser(User user);
+
+        bool UpdateDVtable(string DVT);
     }
     public class UserContext : IUserContext
     {
@@ -35,6 +41,45 @@ namespace FindFiddo.DataAccess
         {
             throw new NotImplementedException();
         }
+
+        public IList<User> GetAllUsuarios()
+        {
+            try
+            {
+                IList<User> Usuarios = new List<User>();
+
+                using SqlCommand cmd = new SqlCommand("GetUserByEmail", _conn);
+
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    User user = new User();
+                    user.Id = reader.GetGuid(reader.GetOrdinal("id_usuario"));
+                    user.nombres = (string)reader["nombres"];
+                    user.apellidos = (string)reader["apellidos"];
+                    user.password = (string)reader["clave"];
+                    user.dni = (string)reader["dni"];
+                    user.email = (string)reader["email"];
+                    user.telefono = (string)reader["telefono"];
+                    user.fechaNacimiento = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
+                    user.DV = (string)reader["dv"];
+                    Usuarios.Add(user);
+                }
+
+                return Usuarios;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
+        }
+    
 
         public User GetById(int id)
         {
@@ -159,6 +204,53 @@ namespace FindFiddo.DataAccess
             }
             //throw new NotImplementedException();
             
+        }
+
+        public bool UpdateDVtable(string DVT)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("crearStoredProcedure", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                //cmd.Parameters.AddWithValue("@id_usuario",user.Id);
+                cmd.Parameters.AddWithValue("@DigitoVerificador",DVT);
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+
+            _conn.Close(); 
+            }
+        }
+
+        public bool UpdateDVuser(User user)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("crearStoredProcedure", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                //cmd.Parameters.AddWithValue("@id_usuario",user.Id);
+                cmd.Parameters.AddWithValue("@DV", user.DV);
+                cmd.Parameters.AddWithValue("@Id_user", user.Id);
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+
+                _conn.Close();
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ namespace FindFiddo.Repository
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         User signUP(User user);
+        IList<User> GetAllUsuarios();
     }
     public class UserRepository : IUserRepository
     {
@@ -26,6 +27,11 @@ namespace FindFiddo.Repository
         public IList<User> GetAll()
         {
             throw new NotImplementedException();
+        }
+
+        public IList<User> GetAllUsuarios()
+        {
+            return _ctx.GetAllUsuarios();
         }
 
         public User GetById(int id)

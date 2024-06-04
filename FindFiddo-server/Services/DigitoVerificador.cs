@@ -32,13 +32,13 @@ namespace FindFiddo.Services
             return EncryptService.GenerarMD5(DV);
         }
 
-        public static string CalcularDVTabla(IEnumerable<IVerificable> List)
+        public static string CalcularDVTabla(IList<User> ususarios)//IEnumerable<IVerificable> List)
         {
             string DVT = string.Empty;
-            if (List != null)
+            if (ususarios != null)
             {
 
-                foreach (IVerificable i in List)
+                foreach (User i in ususarios)
                 {
                     DVT += i.DV;
                 }
