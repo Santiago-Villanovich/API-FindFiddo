@@ -27,12 +27,13 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        public ActionResult<User> Login([FromBody] LoginUser logUser)
+        public IActionResult Login([FromBody] LoginUser logUser)
         {
             var user = _user.GetUserByEmail(logUser.email);
             if (user != null)
             {
-                if (EncryptService.VerifyPassword(logUser.password,user.salt,user.password))
+                //if (EncryptService.VerifyPassword(logUser.password,user.salt,user.password))
+                if (user.password == logUser.password)
                 {
                     return Ok(user);
                 }
@@ -50,47 +51,20 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("SignUP")]
-        public ActionResult<User> SignUp([FromBody] User user)
+        [Route("Signup")]
+        public IActionResult SignUp([FromBody] User user)
         {
             try
             {
                 User UsuarioNew = _user.SignUP(user);
                 return Ok(UsuarioNew);
+
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        /*[Route("register")]
-        [HttpPost]
-        public ActionResult<LoginResponseSchema> Register([FromBody] RegisterSchema schema)
-        {
-
-            using SqlConnection con = new SqlConnection(_config.GetConnectionString("defaultConnection"));
-            using SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = con;
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.CommandText = "registerUser";
-
-            var salt = Hash.GenerateSalt();
-
-            var hashedPassword = Hash.Compute(schema.Password, salt);
-
-            cmd.Parameters.AddWithValue("@Email", schema.Email);
-            cmd.Parameters.AddWithValue("@DNI", schema.DNI);
-            cmd.Parameters.AddWithValue("@Password", hashedPassword);
-            cmd.Parameters.AddWithValue("@Name", schema.Name);
-            cmd.Parameters.AddWithValue("@Salt", salt);
-
-            con.Open();
-
-            cmd.ExecuteNonQuery();
-
-            return Ok(new LoginResponseSchema() { Name = schema.Name, Email = schema.Email, DNI = schema.DNI });
-
-        }*/
+        
     }
 }

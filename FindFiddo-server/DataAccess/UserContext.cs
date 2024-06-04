@@ -123,10 +123,9 @@ namespace FindFiddo.DataAccess
         {
             try
             {
-                user.DV= DigitoVerificador.CalcularDV(user);
-                using SqlCommand cmd = new SqlCommand("sp_InsertUser", _conn);
+                using SqlCommand cmd = new SqlCommand("InsertUser", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                //cmd.Parameters.AddWithValue("@id_usuario",user.Id);
+
                 cmd.Parameters.AddWithValue("@id_rol", user.rol.Id);
                 cmd.Parameters.AddWithValue("@nombres", user.nombres);
                 cmd.Parameters.AddWithValue("@apellidos", user.apellidos);
@@ -138,16 +137,24 @@ namespace FindFiddo.DataAccess
                 cmd.Parameters.AddWithValue("@direccion", user.direccion);
                 cmd.Parameters.AddWithValue("@codigo_postal", user.codigoPostal);
                 cmd.Parameters.AddWithValue("@dv", user.DV);
-
-                var salt = EncryptService.GenerateSalt();
-                cmd.Parameters.AddWithValue("@salt", salt);
+                cmd.Parameters.AddWithValue("@salt", user.salt);
                 cmd.Parameters.AddWithValue("@fecha_creacion", DateTime.Now);
 
 
                 _conn.Open();
-                cmd.ExecuteNonQuery();
+                var result = cmd.ExecuteScalar().ToString();
 
-                return user;
+                Guid id;
+                if (Guid.TryParse(result, out id))
+                {
+                    user.Id = id;
+                    return user;
+                }
+                else
+                {
+                    throw new Exception("Ya se encuentra registrado un usuario con el mail");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -157,7 +164,6 @@ namespace FindFiddo.DataAccess
             {
                 _conn.Close();
             }
-            //throw new NotImplementedException();
             
         }
     }
