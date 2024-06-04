@@ -6,12 +6,14 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Net;
+using FindFiddo.Services;
 
 namespace FindFiddo.DataAccess
 {
     public interface IUserContext: ICrud<User>
     {
         User GetUserByEmail(string email);
+        User signUP(User user);
     }
     public class UserContext : IUserContext
     {
@@ -84,6 +86,47 @@ namespace FindFiddo.DataAccess
         public User Save(User entity)
         {
             throw new NotImplementedException();
+        }
+
+        public User signUP(User user)
+        {
+            try
+            {
+                user.DV= DigitoVerificador.CalcularDV(user);
+                using SqlCommand cmd = new SqlCommand("sp_InsertUser", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_usuario",user.Id);
+                cmd.Parameters.AddWithValue("@id_rol", user.rol.Id);
+                cmd.Parameters.AddWithValue("@nombres", user.nombres);
+                cmd.Parameters.AddWithValue("@apellidos", user.apellidos);
+                cmd.Parameters.AddWithValue("@dni", user.dni);
+                cmd.Parameters.AddWithValue("@email", user.email);
+                cmd.Parameters.AddWithValue("@telefono", user.telefono);
+                cmd.Parameters.AddWithValue("@clave", user.password);
+                cmd.Parameters.AddWithValue("@fecha_nacimiento", user.fechaNacimiento);
+                cmd.Parameters.AddWithValue("@direccion", user.direccion);
+                cmd.Parameters.AddWithValue("@codigo_postal", user.codigoPostal);
+                cmd.Parameters.AddWithValue("@dv", user.DV);
+
+                var salt = EncryptService.GenerateSalt();
+                cmd.Parameters.AddWithValue("@salt", salt);
+                cmd.Parameters.AddWithValue("@fecha_creacion", DateTime.Now);
+
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+                return 
+            }
+            catch (Exception)
+            {
+
+            }
+            finally
+            {
+                _conn.Close();
+            }
+            //throw new NotImplementedException();
+            
         }
     }
 }

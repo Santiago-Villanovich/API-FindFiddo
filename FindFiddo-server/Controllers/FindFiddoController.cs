@@ -47,6 +47,21 @@ namespace FindFiddo_Server.Controllers
             }
         }
 
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("SignUP")]
+        public ActionResult<User> SignUp([FromBody] User user)
+        {
+            try
+            {
+                var user = 
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         /*[Route("register")]
         [HttpPost]
         public ActionResult<LoginResponseSchema> Register([FromBody] RegisterSchema schema)

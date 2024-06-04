@@ -7,6 +7,7 @@ namespace FindFiddo.Repository
     public interface IUserRepository : ICrud<User>
     {
         User GetUserByEmail(string email);
+        User signUP(User user);
     }
     public class UserRepository : IUserRepository
     {
@@ -39,6 +40,11 @@ namespace FindFiddo.Repository
         public User Save(User entity)
         {
             throw new NotImplementedException();
+        }
+
+        public User signUP(User user)
+        {
+            return _ctx.signUP(user);   
         }
     }
 }

@@ -14,6 +14,8 @@ namespace FindFiddo.Application
     public interface IUsuarioApp: ICrud<User>
     {
         User GetUserByEmail(string email);
+
+        User SignUP(User user);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -47,6 +49,11 @@ namespace FindFiddo.Application
         public User Save(User entity)
         {
             throw new NotImplementedException();
+        }
+
+        public User SignUP(User user)
+        {
+            return _repo.signUP(user);
         }
     }
 }
