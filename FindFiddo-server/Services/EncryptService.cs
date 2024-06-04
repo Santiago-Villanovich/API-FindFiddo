@@ -122,7 +122,7 @@ namespace FindFiddo.Services
         {
             using (var rng = new RNGCryptoServiceProvider())
             {
-                byte[] salt = new byte[16]; // Adjust the size based on your security requirements
+                byte[] salt = new byte[16];
                 rng.GetBytes(salt);
                 return salt;
             }

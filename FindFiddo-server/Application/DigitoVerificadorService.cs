@@ -13,9 +13,9 @@ namespace FindFiddo.Application
     internal class DigitoVerificadorService
     {
         UserContext _ctx;
-        public DigitoVerificadorService()
+        public DigitoVerificadorService(IConfiguration configuration)
         {
-            _ctx = new UserContext();
+            _ctx = new UserContext(configuration);
         }
 
         public IList<User> VerificarDigitoXuser(IList<User> Usuarios)
