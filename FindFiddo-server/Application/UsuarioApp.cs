@@ -14,6 +14,7 @@ namespace FindFiddo.Application
     public interface IUsuarioApp: ICrud<User>
     {
         User GetUserByEmail(string email);
+        List<Rol> GetUserRols(Guid idUsuario);
 
         User SignUP(User user);
     }
@@ -43,7 +44,18 @@ namespace FindFiddo.Application
 
         public User GetUserByEmail(string email)
         {
-            return _repo.GetUserByEmail(email);
+            var user = _repo.GetUserByEmail(email);
+            if (user != null)
+            {
+                var roles = _repo.GetUserRols(user.Id);
+                user.rolUsuario = roles.FirstOrDefault().nombre;
+            }
+            return user;
+        }
+
+        public List<Rol> GetUserRols(Guid idUsuario)
+        {
+            return _repo.GetUserRols(idUsuario);
         }
 
         public User Save(User entity)

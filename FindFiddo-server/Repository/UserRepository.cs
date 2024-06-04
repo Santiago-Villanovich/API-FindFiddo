@@ -7,6 +7,7 @@ namespace FindFiddo.Repository
     public interface IUserRepository : ICrud<User>
     {
         User GetUserByEmail(string email);
+        List<Rol> GetUserRols(Guid idUsuario);
         User signUP(User user);
     }
     public class UserRepository : IUserRepository
@@ -35,6 +36,11 @@ namespace FindFiddo.Repository
         public User GetUserByEmail(string email)
         {
             return _ctx.GetUserByEmail(email);
+        }
+
+        public List<Rol> GetUserRols(Guid idUsuario)
+        {
+            return _ctx.GetUserRols(idUsuario);
         }
 
         public User Save(User entity)
