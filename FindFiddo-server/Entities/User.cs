@@ -5,7 +5,7 @@ namespace FindFiddo.Entities
     public class User: Entity, IVerificable
     {
         public Rol rol { get; set; } = null!;
-
+        public string rolUsuario {  get; set; }
         [VerificableProperty]
         public string nombres { get; set; } = null!;
         [VerificableProperty]

@@ -12,6 +12,7 @@ namespace FindFiddo.DataAccess
     public interface IUserContext: ICrud<User>
     {
         User GetUserByEmail(string email);
+        List<Rol> GetUserRols(Guid idUsuario);
     }
     public class UserContext : IUserContext
     {
@@ -66,11 +67,6 @@ namespace FindFiddo.DataAccess
                     user.DV = (string)reader["dv"];
                     //user.salt = Convert.FromBase64String((string)reader["salt"]);
 
-                    user.rol = new Rol()
-                    {
-                        Id = reader.GetGuid(reader.GetOrdinal("id_rol")),
-                        nombre = (string)reader["nombre_rol"]
-                    };
                 }
 
                 return user;
@@ -79,6 +75,41 @@ namespace FindFiddo.DataAccess
             {
                 throw;
             }finally { _conn.Close(); }
+        }
+
+        public List<Rol> GetUserRols(Guid idUsuario)
+        {
+            List<Rol> list = new List<Rol>();
+            try
+            {
+                Rol rol = null;
+
+                using SqlCommand cmd = new SqlCommand("GetUserRoles", _conn);
+
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    rol = new Rol()
+                    {
+                        Id = reader.GetGuid(reader.GetOrdinal("id_usuario")),
+                        nombre = reader.GetString(reader.GetOrdinal("nombre_rol"))
+                    };
+
+                    list.Add(rol);
+                }
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
         }
 
         public User Save(User entity)
