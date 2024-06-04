@@ -47,8 +47,8 @@ namespace FindFiddo.Application
             var user = _repo.GetUserByEmail(email);
             if (user != null)
             {
-                var roles = _repo.GetUserRols(user.Id);
-                user.rolUsuario = roles.FirstOrDefault().nombre;
+                //var roles = _repo.GetUserRols(user.Id);
+                //user.rolUsuario = roles.FirstOrDefault().nombre;
             }
             return user;
         }
@@ -65,6 +65,11 @@ namespace FindFiddo.Application
 
         public User SignUP(User user)
         {
+            user.DV = DigitoVerificador.CalcularDV(user);
+
+            user.salt = EncryptService.GenerateSalt();
+            user.password = EncryptService.Compute(user.password,user.salt);
+
             return _repo.signUP(user);
         }
     }
