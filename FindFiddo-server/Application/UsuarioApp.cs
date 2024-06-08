@@ -9,8 +9,7 @@ namespace FindFiddo.Application
     {
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
-
-        User SignUP(User user);
+        LogedUser SignUP(User user);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -28,7 +27,7 @@ namespace FindFiddo.Application
 
         public IList<User> GetAll()
         {
-            throw new NotImplementedException();
+            return _repo.GetAll();
         }
 
         public User GetById(int id)
@@ -41,8 +40,7 @@ namespace FindFiddo.Application
             var user = _repo.GetUserByEmail(email);
             if (user != null)
             {
-                //var roles = _repo.GetUserRols(user.Id);
-                //user.rolUsuario = roles.FirstOrDefault().nombre;
+                user.rol = _repo.GetUserRols(user.Id);
             }
             return user;
         }
@@ -57,7 +55,7 @@ namespace FindFiddo.Application
             throw new NotImplementedException();
         }
 
-        public User SignUP(User user)
+        public LogedUser SignUP(User user)
         {
             user.DV = DigitoVerificador.CalcularDV(user);
 

@@ -2,7 +2,7 @@
 using FindFiddo.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using FindFiddo.Services;
 
 namespace FindFiddo_Server.Controllers
 {
@@ -28,8 +28,8 @@ namespace FindFiddo_Server.Controllers
             var user = _user.GetUserByEmail(logUser.email);
             if (user != null)
             {
-                //if (EncryptService.VerifyPassword(logUser.password,user.salt,user.password))
-                if (user.password == logUser.password)
+                if (EncryptService.VerifyPassword(logUser.password,user.salt,user.password))
+                //if (user.password == logUser.password)
                 {
                     return Ok(user);
                 }
@@ -52,8 +52,17 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                User UsuarioNew = _user.SignUP(user);
-                return Ok(UsuarioNew);
+                if (user.rol.Count() >= 1) //Si no tiene rol le asigno el usuario default
+                {
+                    user.rol = new List<Rol>
+                    {
+                        new Rol() { Id = Guid.Parse("05953C7E-3250-49B5-89C3-3C44C2D46A83"), nombre = "User" }
+                    };
+
+                }
+
+                LogedUser UsrLoged = _user.SignUP(user);
+                return Ok(UsrLoged);
 
             }
             catch (Exception ex)

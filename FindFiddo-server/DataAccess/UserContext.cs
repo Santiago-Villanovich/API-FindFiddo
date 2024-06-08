@@ -1,5 +1,7 @@
 ﻿using FindFiddo.Abstractions;
 using FindFiddo.Entities;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Data.SqlClient;
 
 
@@ -9,12 +11,10 @@ namespace FindFiddo.DataAccess
     {
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
-        User signUP(User user);
-
-        IList<User> GetAllUsuarios();
-
+        LogedUser signUP(User user);
+        void InsertUserLog(Guid idUser, string accion);
+        void InsertUserRol(Guid idUser, List<Rol> roles);
         bool UpdateDVuser(User user);
-
         bool UpdateDVtable(string DVT);
     }
     public class UserContext : IUserContext
@@ -32,11 +32,6 @@ namespace FindFiddo.DataAccess
         }
 
         public IList<User> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<User> GetAllUsuarios()
         {
             try
             {
@@ -107,7 +102,7 @@ namespace FindFiddo.DataAccess
                     user.telefono = (string)reader["telefono"];
                     user.fechaNacimiento = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
                     user.DV = (string)reader["dv"];
-                    //user.salt = Convert.FromBase64String((string)reader["salt"]);
+                    user.salt = Convert.FromBase64String((string)reader["salt"]);
 
                 }
 
@@ -139,7 +134,7 @@ namespace FindFiddo.DataAccess
                 {
                     rol = new Rol()
                     {
-                        Id = reader.GetGuid(reader.GetOrdinal("id_usuario")),
+                        Id = reader.GetGuid(reader.GetOrdinal("id_rol")),
                         nombre = reader.GetString(reader.GetOrdinal("nombre_rol"))
                     };
 
@@ -160,14 +155,13 @@ namespace FindFiddo.DataAccess
             throw new NotImplementedException();
         }
 
-        public User signUP(User user)
+        public LogedUser signUP(User user)
         {
             try
             {
                 using SqlCommand cmd = new SqlCommand("InsertUser", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@id_rol", user.rol.Id);
                 cmd.Parameters.AddWithValue("@nombres", user.nombres);
                 cmd.Parameters.AddWithValue("@apellidos", user.apellidos);
                 cmd.Parameters.AddWithValue("@dni", user.dni);
@@ -188,8 +182,7 @@ namespace FindFiddo.DataAccess
                 Guid id;
                 if (Guid.TryParse(result, out id))
                 {
-                    user.Id = id;
-                    return user;
+                    return new LogedUser(id,user.telefono,user.email,user.nombres,user.apellidos);
                 }
                 else
                 {
@@ -253,6 +246,54 @@ namespace FindFiddo.DataAccess
 
                 _conn.Close();
             }
+        }
+
+        public void InsertUserLog(Guid idUser, string accion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("InsertUserLog", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                _conn.Open();
+                cmd.Parameters.AddWithValue("@idUsuario", idUser);
+                cmd.Parameters.AddWithValue("@accion", accion);
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public void InsertUserRol(Guid idUser, List<Rol> roles)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("SetUsuarioRol", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                _conn.Open();
+                foreach (Rol rol in roles)
+                {
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@idUsuario", idUser);
+                    cmd.Parameters.AddWithValue("@idRol", rol.Id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
         }
     }
 }
