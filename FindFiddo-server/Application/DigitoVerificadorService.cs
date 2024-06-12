@@ -12,10 +12,10 @@ namespace FindFiddo.Application
 {
     internal class DigitoVerificadorService
     {
-        UserContext _ctx;
-        public DigitoVerificadorService(IConfiguration configuration)
+        UsuarioApp _user;
+        public DigitoVerificadorService(UsuarioApp user)
         {
-            _ctx = new UserContext(configuration);
+            _user = user;
         }
 
         public IList<User> VerificarDigitoXuser(IList<User> Usuarios)
@@ -48,7 +48,7 @@ namespace FindFiddo.Application
                 if(DVnew != usuario.DV)
                 {
                     usuario.DV = DVnew;
-                    _ctx.UpdateDVuser(usuario);
+                    _user.UpdateDVuser(usuario);
                     
                 }     
                 
@@ -63,7 +63,7 @@ namespace FindFiddo.Application
             try
             {
                 string DVTnew = DigitoVerificador.CalcularDVTabla(ususarios);
-                _ctx.UpdateDVtable(DVTnew);
+                _user.UpdateDVtable(DVTnew);
                
             }catch (Exception ex)
             {
@@ -74,7 +74,7 @@ namespace FindFiddo.Application
         public bool VerificarDigitoTable(string DVtable)
         {
             IList<User> usuarios = new List<User>();
-            usuarios = _ctx.GetAllUsuarios();
+            usuarios = _user.GetAll();
             string DVTnew = DigitoVerificador.CalcularDVTabla(usuarios);
             if(DVtable != DVTnew)
             {

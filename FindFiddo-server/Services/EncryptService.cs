@@ -124,6 +124,7 @@ namespace FindFiddo.Services
             {
                 byte[] salt = new byte[16];
                 rng.GetBytes(salt);
+                Console.WriteLine("Generated Salt: " + BitConverter.ToString(salt));
                 return salt;
             }
         }

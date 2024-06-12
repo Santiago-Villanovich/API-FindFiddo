@@ -2,6 +2,7 @@
 using FindFiddo.Entities;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Data;
 using System.Data.SqlClient;
 
 
@@ -24,6 +25,7 @@ namespace FindFiddo.DataAccess
         public UserContext(IConfiguration configuration)
         {
             _config = configuration;
+            _conn = new SqlConnection(_config.GetConnectionString("default"));
         }
 
         public void DeleteById(int id)
@@ -102,7 +104,7 @@ namespace FindFiddo.DataAccess
                     user.telefono = (string)reader["telefono"];
                     user.fechaNacimiento = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
                     user.DV = (string)reader["dv"];
-                    user.salt = Convert.FromBase64String((string)reader["salt"]);
+                    user.salt = (byte[])reader["salt"];
 
                 }
 

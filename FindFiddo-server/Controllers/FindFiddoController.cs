@@ -29,9 +29,8 @@ namespace FindFiddo_Server.Controllers
             if (user != null)
             {
                 if (EncryptService.VerifyPassword(logUser.password,user.salt,user.password))
-                //if (user.password == logUser.password)
                 {
-                    return Ok(user);
+                    return Ok(new LogedUser(user.Id,user.telefono,user.email,user.nombres,user.apellidos));
                 }
                 else
                 {
@@ -52,7 +51,7 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                if (user.rol.Count() >= 1) //Si no tiene rol le asigno el usuario default
+                if (!(user.rol.Count() > 0)) //Si no tiene rol le asigno el usuario default
                 {
                     user.rol = new List<Rol>
                     {

@@ -4,7 +4,7 @@ namespace FindFiddo.Entities
 {
     public class User: Entity, IVerificable
     {
-        public List<Rol> rol { get; set; }
+        public List<Rol>? rol { get; set; }
 
         [VerificableProperty]
         public string? nombres { get; set; }
@@ -38,7 +38,7 @@ namespace FindFiddo.Entities
         public string? email { get; set; } = null!;
         public string? nombres { get; set; } = null!;
         public string?   apellidos { get; set; } = null!;
-        public List<Rol>? rol { get; set; } = null!;
+        //public List<Rol>? rol { get; set; } = null!;
 
         public LogedUser() { }
         public LogedUser(Guid id,string? telefono, string? email, string? nombres, string? apellidos)

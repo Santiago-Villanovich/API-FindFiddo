@@ -10,6 +10,8 @@ namespace FindFiddo.Application
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser SignUP(User user);
+        bool UpdateDVuser(User user);
+        bool UpdateDVtable(string DVT);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -63,6 +65,16 @@ namespace FindFiddo.Application
             user.password = EncryptService.Compute(user.password, user.salt);
 
             return _repo.signUP(user);
+        }
+
+        public bool UpdateDVuser(User user)
+        {
+            return _repo.UpdateDVuser(user);
+        }
+
+        public bool UpdateDVtable(string DVT)
+        {
+            return _repo.UpdateDVtable(DVT);
         }
     }
 }

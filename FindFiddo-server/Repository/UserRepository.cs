@@ -9,6 +9,8 @@ namespace FindFiddo.Repository
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser signUP(User user);
+        bool UpdateDVuser(User user);
+        bool UpdateDVtable(string DVT);
     }
     public class UserRepository : IUserRepository
     {
@@ -27,7 +29,7 @@ namespace FindFiddo.Repository
 
         public IList<User> GetAll()
         {
-            return _ctx.GetAllUsuarios();
+            return _ctx.GetAll();
         }
 
         public User GetById(int id)
@@ -58,6 +60,16 @@ namespace FindFiddo.Repository
             _ctx.InsertUserLog(u.Id, "SignUp");
             
             return u;
+        }
+
+        public bool UpdateDVuser(User user)
+        {
+            return _ctx.UpdateDVuser(user);
+        }
+
+        public bool UpdateDVtable(string DVT)
+        {
+            return _ctx.UpdateDVtable(DVT);
         }
     }
 }
