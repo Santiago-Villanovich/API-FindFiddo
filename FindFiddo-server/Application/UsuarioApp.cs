@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using FindFiddo.Abstractions;
+﻿using FindFiddo.Abstractions;
 using FindFiddo.Entities;
 using FindFiddo.Repository;
 using FindFiddo.Services;
 
 namespace FindFiddo.Application
 {
-    public interface IUsuarioApp: ICrud<User>
+    public interface IUsuarioApp : ICrud<User>
     {
         User GetUserByEmail(string email);
+        List<Rol> GetUserRols(Guid idUsuario);
+        LogedUser SignUP(User user);
+        bool UpdateDVuser(User user);
+        bool UpdateDVtable(string DVT);
     }
     public class UsuarioApp : IUsuarioApp
     {
         UserRepository _repo;
-        public UsuarioApp() 
+        public UsuarioApp(IConfiguration configuration)
         {
-            _repo = new UserRepository();
+            _repo = new UserRepository(configuration);
         }
 
 
@@ -31,7 +29,7 @@ namespace FindFiddo.Application
 
         public IList<User> GetAll()
         {
-            throw new NotImplementedException();
+            return _repo.GetAll();
         }
 
         public User GetById(int id)
@@ -41,12 +39,42 @@ namespace FindFiddo.Application
 
         public User GetUserByEmail(string email)
         {
-            return _repo.GetUserByEmail(email);
+            var user = _repo.GetUserByEmail(email);
+            if (user != null)
+            {
+                user.rol = _repo.GetUserRols(user.Id);
+            }
+            return user;
+        }
+
+        public List<Rol> GetUserRols(Guid idUsuario)
+        {
+            return _repo.GetUserRols(idUsuario);
         }
 
         public User Save(User entity)
         {
             throw new NotImplementedException();
+        }
+
+        public LogedUser SignUP(User user)
+        {
+            user.DV = DigitoVerificador.CalcularDV(user);
+
+            user.salt = EncryptService.GenerateSalt();
+            user.password = EncryptService.Compute(user.password, user.salt);
+
+            return _repo.signUP(user);
+        }
+
+        public bool UpdateDVuser(User user)
+        {
+            return _repo.UpdateDVuser(user);
+        }
+
+        public bool UpdateDVtable(string DVT)
+        {
+            return _repo.UpdateDVtable(DVT);
         }
     }
 }

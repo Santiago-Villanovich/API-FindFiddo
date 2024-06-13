@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
+﻿using FindFiddo.Application;
 using FindFiddo.Entities;
-using FindFiddo.Application;
-using FindFiddo.Services;
 using Microsoft.AspNetCore.Authorization;
-
+using Microsoft.AspNetCore.Mvc;
+using FindFiddo.Services;
 
 namespace FindFiddo_Server.Controllers
 {
@@ -14,27 +11,26 @@ namespace FindFiddo_Server.Controllers
     public class FindFiddoController : ControllerBase
     {
         private readonly ILogger<FindFiddoController> _logger;
-        private readonly IConfiguration _config;
-        private UsuarioApp _user; 
+
+        private UsuarioApp _user;
 
         public FindFiddoController(IConfiguration config, ILogger<FindFiddoController> logger)
         {
-            _config = config;
             _logger = logger;
-            _user = new UsuarioApp();
+            _user = new UsuarioApp(config);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        public ActionResult<User> Login([FromBody] LoginUser logUser)
+        public IActionResult Login([FromBody] LoginUser logUser)
         {
             var user = _user.GetUserByEmail(logUser.email);
             if (user != null)
             {
                 if (EncryptService.VerifyPassword(logUser.password,user.salt,user.password))
                 {
-                    return Ok(user);
+                    return Ok(new LogedUser(user.Id,user.telefono,user.email,user.nombres,user.apellidos));
                 }
                 else
                 {
@@ -47,34 +43,33 @@ namespace FindFiddo_Server.Controllers
             }
         }
 
-        /*[Route("register")]
+
+        [AllowAnonymous]
         [HttpPost]
-        public ActionResult<LoginResponseSchema> Register([FromBody] RegisterSchema schema)
+        [Route("Signup")]
+        public IActionResult SignUp([FromBody] User user)
         {
+            try
+            {
+                if (!(user.rol.Count() > 0)) //Si no tiene rol le asigno el usuario default
+                {
+                    user.rol = new List<Rol>
+                    {
+                        new Rol() { Id = Guid.Parse("05953C7E-3250-49B5-89C3-3C44C2D46A83"), nombre = "User" }
+                    };
 
-            using SqlConnection con = new SqlConnection(_config.GetConnectionString("defaultConnection"));
-            using SqlCommand cmd = new SqlCommand();
+                }
 
-            cmd.Connection = con;
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.CommandText = "registerUser";
+                LogedUser UsrLoged = _user.SignUP(user);
+                return Ok(UsrLoged);
 
-            var salt = Hash.GenerateSalt();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            var hashedPassword = Hash.Compute(schema.Password, salt);
 
-            cmd.Parameters.AddWithValue("@Email", schema.Email);
-            cmd.Parameters.AddWithValue("@DNI", schema.DNI);
-            cmd.Parameters.AddWithValue("@Password", hashedPassword);
-            cmd.Parameters.AddWithValue("@Name", schema.Name);
-            cmd.Parameters.AddWithValue("@Salt", salt);
-
-            con.Open();
-
-            cmd.ExecuteNonQuery();
-
-            return Ok(new LoginResponseSchema() { Name = schema.Name, Email = schema.Email, DNI = schema.DNI });
-
-        }*/
     }
 }
