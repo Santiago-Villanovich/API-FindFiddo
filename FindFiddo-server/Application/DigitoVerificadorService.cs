@@ -1,7 +1,9 @@
-﻿using FindFiddo.DataAccess;
+﻿using FindFiddo.Abstractions;
+using FindFiddo.DataAccess;
 using FindFiddo.Entities;
 using FindFiddo.Repository;
 using FindFiddo.Services;
+using FindFiddo_server.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,10 @@ namespace FindFiddo.Application
 {
     internal class DigitoVerificadorService
     {
-        UsuarioApp _user;
-        public DigitoVerificadorService(UsuarioApp user)
+        DVRepository _repo;
+        public DigitoVerificadorService(IConfiguration configuration)
         {
-            _user = user;
+            _repo = new DVRepository(configuration);
         }
 
         public IList<User> VerificarDigitoXuser(IList<User> Usuarios)
@@ -31,6 +33,7 @@ namespace FindFiddo.Application
                         UsuariosModificados.Add(usuario);
                     }
                 }
+
                 return UsuariosModificados;
             }
             catch (Exception ex)
@@ -40,49 +43,32 @@ namespace FindFiddo.Application
            
         }
 
-        public void ActualizarDigitoVerificadorUser(User usuario)
+
+        public void UpdateUserDVTable(string tableName,IEnumerable<IVerificable> entidades)
         {
             try
             {
-                string DVnew = DigitoVerificador.CalcularDV(usuario);
-                if(DVnew != usuario.DV)
-                {
-                    usuario.DV = DVnew;
-                    _user.UpdateDVuser(usuario);
-                    
-                }     
-                
-            }catch(Exception ex)
+                string DVTnew = DigitoVerificador.CalcularDVTabla(entidades);
+                _repo.UpdateDVtable("usuario", tableName);
+
+            }catch (Exception ex)
             {
                 throw ex;
             }
         }
 
-        public void ActualizarDigitoVerificadorTable(IList<User> ususarios)
+        public bool VerificarDigitoTable(string tableName, IEnumerable<IVerificable> entidades)
         {
-            try
+            string storedDV = _repo.GetDVbyName(tableName);
+            string calculedDV = DigitoVerificador.CalcularDVTabla(entidades);
+
+            if(storedDV.Equals(calculedDV))
             {
-                string DVTnew = DigitoVerificador.CalcularDVTabla(ususarios);
-                _user.UpdateDVtable(DVTnew);
-               
-            }catch (Exception ex)
-            {
-                throw ex;
-            }
-            
-        }
-        public bool VerificarDigitoTable(string DVtable)
-        {
-            IList<User> usuarios = new List<User>();
-            usuarios = _user.GetAll();
-            string DVTnew = DigitoVerificador.CalcularDVTabla(usuarios);
-            if(DVtable != DVTnew)
-            {
-                return false;
+                return true;
             }
             else
             {
-                return true;
+                return false;
             }
         }
     }

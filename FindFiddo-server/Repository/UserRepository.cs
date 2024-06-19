@@ -10,7 +10,6 @@ namespace FindFiddo.Repository
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser signUP(User user);
         bool UpdateDVuser(User user);
-        bool UpdateDVtable(string DVT);
     }
     public class UserRepository : IUserRepository
     {
@@ -67,9 +66,5 @@ namespace FindFiddo.Repository
             return _ctx.UpdateDVuser(user);
         }
 
-        public bool UpdateDVtable(string DVT)
-        {
-            return _ctx.UpdateDVtable(DVT);
-        }
     }
 }

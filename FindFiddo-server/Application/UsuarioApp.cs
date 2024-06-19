@@ -11,7 +11,6 @@ namespace FindFiddo.Application
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser SignUP(User user);
         bool UpdateDVuser(User user);
-        bool UpdateDVtable(string DVT);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -71,10 +70,6 @@ namespace FindFiddo.Application
         {
             return _repo.UpdateDVuser(user);
         }
-
-        public bool UpdateDVtable(string DVT)
-        {
-            return _repo.UpdateDVtable(DVT);
-        }
+        
     }
 }

@@ -16,7 +16,6 @@ namespace FindFiddo.DataAccess
         void InsertUserLog(Guid idUser, string accion);
         void InsertUserRol(Guid idUser, List<Rol> roles);
         bool UpdateDVuser(User user);
-        bool UpdateDVtable(string DVT);
     }
     public class UserContext : IUserContext
     {
@@ -39,7 +38,7 @@ namespace FindFiddo.DataAccess
             {
                 IList<User> Usuarios = new List<User>();
 
-                using SqlCommand cmd = new SqlCommand("GetUserByEmail", _conn);
+                using SqlCommand cmd = new SqlCommand("GetAllUsers", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 
@@ -201,29 +200,6 @@ namespace FindFiddo.DataAccess
                 _conn.Close();
             }
 
-        }
-
-        public bool UpdateDVtable(string DVT)
-        {
-            try
-            {
-                using SqlCommand cmd = new SqlCommand("crearStoredProcedure", _conn);
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                //cmd.Parameters.AddWithValue("@id_usuario",user.Id);
-                cmd.Parameters.AddWithValue("@DigitoVerificador",DVT);
-                _conn.Open();
-                cmd.ExecuteNonQuery();
-                return true;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-
-            _conn.Close(); 
-            }
         }
 
         public bool UpdateDVuser(User user)
