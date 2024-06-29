@@ -14,12 +14,18 @@ namespace FindFiddo.Entities
         public string? dni { get; set; }
         [VerificableProperty]
         public string? email { get; set; }
+        [VerificableProperty]
         public string? telefono { get; set; }
+        [VerificableProperty]
         public string? password { get; set; }
+        [VerificableProperty]
         public DateTime fechaNacimiento { get; set; }
+        [VerificableProperty]
         public string? direccion { get; set; }
-        public int codigoPostal { get; set; } 
-        public byte[]? salt { get; set; } 
+        [VerificableProperty]
+        public int codigoPostal { get; set; }
+        [VerificableProperty]
+        public byte[]? salt { get; set; }
         public string? DV { get; set; }
 
         public User() { }

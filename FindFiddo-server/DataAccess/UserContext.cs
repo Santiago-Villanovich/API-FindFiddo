@@ -1,5 +1,6 @@
 ﻿using FindFiddo.Abstractions;
 using FindFiddo.Entities;
+using FindFiddo_server.Entities;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Data;
@@ -14,8 +15,8 @@ namespace FindFiddo.DataAccess
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser signUP(User user);
         void InsertUserLog(Guid idUser, string accion);
+        List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
         void InsertUserRol(Guid idUser, List<Rol> roles);
-        bool UpdateDVuser(User user);
     }
     public class UserContext : IUserContext
     {
@@ -27,9 +28,27 @@ namespace FindFiddo.DataAccess
             _conn = new SqlConnection(_config.GetConnectionString("default"));
         }
 
-        public void DeleteById(int id)
+        public void DeleteById(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("usr_DeleteUser", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@idUser", id);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _conn.Close();
+            }
         }
 
         public IList<User> GetAll()
@@ -38,7 +57,7 @@ namespace FindFiddo.DataAccess
             {
                 IList<User> Usuarios = new List<User>();
 
-                using SqlCommand cmd = new SqlCommand("GetAllUsers", _conn);
+                using SqlCommand cmd = new SqlCommand("usr_GetAllUsers", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 
@@ -57,6 +76,8 @@ namespace FindFiddo.DataAccess
                     user.email = (string)reader["email"];
                     user.telefono = (string)reader["telefono"];
                     user.fechaNacimiento = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
+                    user.direccion = reader.GetString("direccion");
+                    user.salt = (byte[])reader["salt"];
                     user.DV = (string)reader["dv"];
                     Usuarios.Add(user);
                 }
@@ -71,9 +92,41 @@ namespace FindFiddo.DataAccess
         }
     
 
-        public User GetById(int id)
+        public User GetById(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User usuario = null;
+                using SqlCommand cmd = new SqlCommand("usr_GetAllUsers", _conn);
+
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    usuario = new User();
+                    usuario.Id = id;
+                    usuario.nombres = (string)reader["nombres"];
+                    usuario.apellidos = (string)reader["apellidos"];
+                    usuario.password = (string)reader["clave"];
+                    usuario.dni = (string)reader["dni"];
+                    usuario.email = (string)reader["email"];
+                    usuario.telefono = (string)reader["telefono"];
+                    usuario.fechaNacimiento = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
+                    usuario.DV = (string)reader["dv"];
+                    usuario.salt = (byte[])reader["salt"];
+                }
+
+                return usuario;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
         }
 
         public User GetUserByEmail(string email)
@@ -83,7 +136,7 @@ namespace FindFiddo.DataAccess
                 _conn = new SqlConnection(_config.GetConnectionString("default"));
                 User user = null;
 
-                using SqlCommand cmd = new SqlCommand("GetUserByEmail", _conn);
+                using SqlCommand cmd = new SqlCommand("usr_GetUserByEmail", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@email", email);
@@ -123,7 +176,7 @@ namespace FindFiddo.DataAccess
             {
                 Rol rol = null;
 
-                using SqlCommand cmd = new SqlCommand("GetUserRoles", _conn);
+                using SqlCommand cmd = new SqlCommand("usr_GetUserRoles", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
@@ -160,7 +213,7 @@ namespace FindFiddo.DataAccess
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("InsertUser", _conn);
+                using SqlCommand cmd = new SqlCommand("usr_InsertUser", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@nombres", user.nombres);
@@ -202,35 +255,12 @@ namespace FindFiddo.DataAccess
 
         }
 
-        public bool UpdateDVuser(User user)
-        {
-            try
-            {
-                using SqlCommand cmd = new SqlCommand("crearStoredProcedure", _conn);
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                //cmd.Parameters.AddWithValue("@id_usuario",user.Id);
-                cmd.Parameters.AddWithValue("@DV", user.DV);
-                cmd.Parameters.AddWithValue("@Id_user", user.Id);
-                _conn.Open();
-                cmd.ExecuteNonQuery();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-
-                _conn.Close();
-            }
-        }
 
         public void InsertUserLog(Guid idUser, string accion)
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("InsertUserLog", _conn);
+                using SqlCommand cmd = new SqlCommand("usr_InsertUserLog", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 
@@ -252,7 +282,7 @@ namespace FindFiddo.DataAccess
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("SetUsuarioRol", _conn);
+                using SqlCommand cmd = new SqlCommand("usr_SetUsuarioRol", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 
@@ -272,6 +302,53 @@ namespace FindFiddo.DataAccess
             }
             finally
             { _conn.Close(); }
+        }
+
+        public List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag)
+        {
+            List<UserLog> list = new List<UserLog>();
+            try
+            {
+                UserLog log = null;
+
+                using SqlCommand cmd = new SqlCommand("log_GetUserFiltered", _conn);
+
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@from", from);
+                cmd.Parameters.AddWithValue("@to", to);
+                cmd.Parameters.AddWithValue("@action", !string.IsNullOrEmpty(accion)? accion : DBNull.Value);
+                cmd.Parameters.AddWithValue("@page", pag);
+
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    log = new UserLog()
+                    {
+                        Id = reader.GetGuid("id_log"),
+                        accion = reader.GetString("accion"),
+                        fecha = Convert.ToDateTime(reader["fecha"]),
+                        user = new LogedUser()
+                        {
+                            Id = reader.GetGuid("id_usuario"),
+                            nombres = reader.GetString("nombres"),
+                            apellidos = reader.GetString("apellidos"),
+                            email = reader.GetString("email"),
+                        }
+                    };
+
+                    list.Add(log);
+                }
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
         }
     }
 }

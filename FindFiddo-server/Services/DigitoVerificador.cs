@@ -37,10 +37,9 @@ namespace FindFiddo.Services
             string DVT = string.Empty;
             if (ususarios != null)
             {
-
                 foreach (User i in ususarios)
                 {
-                    DVT += i.DV;
+                    DVT += CalcularDV(i);
                 }
 
             }

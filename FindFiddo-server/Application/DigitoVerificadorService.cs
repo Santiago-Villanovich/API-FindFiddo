@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FindFiddo.Application
 {
-    internal class DigitoVerificadorService
+    public class DigitoVerificadorService
     {
         DVRepository _repo;
         public DigitoVerificadorService(IConfiguration configuration)
@@ -20,6 +20,14 @@ namespace FindFiddo.Application
             _repo = new DVRepository(configuration);
         }
 
+        public bool GenerateBackUp()
+        {
+            return _repo.GenerateBackUp();
+        }
+        public void RestoreBackUp()
+        {
+            _repo.RestoreBackUp();
+        }
         public IList<User> VerificarDigitoXuser(IList<User> Usuarios)
         {
             try
@@ -48,8 +56,12 @@ namespace FindFiddo.Application
         {
             try
             {
+                foreach (User u in entidades)
+                {
+                    UpdateDVuser(u.Id,DigitoVerificador.CalcularDV(u));
+                }
                 string DVTnew = DigitoVerificador.CalcularDVTabla(entidades);
-                _repo.UpdateDVtable("usuario", tableName);
+                _repo.UpdateDVtable(tableName, DVTnew);
 
             }catch (Exception ex)
             {
@@ -70,6 +82,11 @@ namespace FindFiddo.Application
             {
                 return false;
             }
+        }
+
+        public bool UpdateDVuser(Guid idUsuario, string dv)
+        {
+            return _repo.UpdateDVuser(idUsuario, dv);
         }
     }
 }

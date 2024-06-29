@@ -1,6 +1,7 @@
 ﻿using FindFiddo.Abstractions;
 using FindFiddo.DataAccess;
 using FindFiddo.Entities;
+using FindFiddo_server.Entities;
 
 namespace FindFiddo.Repository
 {
@@ -9,7 +10,7 @@ namespace FindFiddo.Repository
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser signUP(User user);
-        bool UpdateDVuser(User user);
+        List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
     }
     public class UserRepository : IUserRepository
     {
@@ -21,9 +22,9 @@ namespace FindFiddo.Repository
             _ctx = new UserContext(configuration);
         }
 
-        public void DeleteById(int id)
+        public void DeleteById(Guid id)
         {
-            throw new NotImplementedException();
+            _ctx.DeleteById(id);
         }
 
         public IList<User> GetAll()
@@ -31,9 +32,9 @@ namespace FindFiddo.Repository
             return _ctx.GetAll();
         }
 
-        public User GetById(int id)
+        public User GetById(Guid id)
         {
-            throw new NotImplementedException();
+            return _ctx.GetById(id);
         }
 
         public User GetUserByEmail(string email)
@@ -61,10 +62,9 @@ namespace FindFiddo.Repository
             return u;
         }
 
-        public bool UpdateDVuser(User user)
+        public List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag)
         {
-            return _ctx.UpdateDVuser(user);
+            return _ctx.GetLog(from, to, accion, pag);
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 
 namespace FindFiddo_server.DataAccess
 {
@@ -6,17 +7,59 @@ namespace FindFiddo_server.DataAccess
     {
         private SqlConnection _conn;
         private readonly IConfiguration _config;
-        public DVContext(IConfiguration configuration) 
-        { 
+        public DVContext(IConfiguration configuration)
+        {
             _config = configuration;
             _conn = new SqlConnection(_config.GetConnectionString("default"));
         }
 
+        public bool GenerateBackUp()
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("bak_CreateBackup", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                string path = _config["BackupSettings:BackupPath"];
+                cmd.Parameters.AddWithValue("@path", path);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }finally { _conn.Close(); }
+        }
+        public void RestoreBackUp()
+        {
+            try
+            {
+                string sql = @"USE [master]
+                               EXEC dbo.bak_RestoreDB @path";
+                using SqlCommand cmd = new SqlCommand(sql, _conn);
+                cmd.CommandType = System.Data.CommandType.Text;
+
+                string path = _config["BackupSettings:BackupPath"];
+                cmd.Parameters.AddWithValue("@path", path);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public bool UpdateDVtable(string tName,string tDV)
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("UpdateTableDV", _conn);
+                using SqlCommand cmd = new SqlCommand("dvf_UpdateTableDV", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@tNombre", tName);
@@ -40,7 +83,7 @@ namespace FindFiddo_server.DataAccess
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("GetDVbyName", _conn);
+                using SqlCommand cmd = new SqlCommand("dvf_GetDVbyName", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@tNombre", tName);
@@ -66,5 +109,32 @@ namespace FindFiddo_server.DataAccess
                 _conn.Close();
             }
         }
+
+        public bool UpdateDVuser(Guid idUsuario, string dv)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("usr_UpdateUserDV", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@dv", dv);
+                cmd.Parameters.AddWithValue("@id", idUsuario);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+
+                _conn.Close();
+            }
+        }
+
+
     }
 }

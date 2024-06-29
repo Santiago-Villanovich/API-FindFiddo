@@ -10,7 +10,7 @@ namespace FindFiddo.Abstractions
     {
         T Save (T entity);
         IList<T> GetAll ();
-        T GetById (int id);
-        void DeleteById (int id);
+        T GetById (Guid id);
+        void DeleteById (Guid id);
     }
 }

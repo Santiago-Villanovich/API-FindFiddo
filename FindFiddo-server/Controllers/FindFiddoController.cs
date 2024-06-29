@@ -49,7 +49,7 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("Signup")]
+        [Route("signup")]
         public IActionResult SignUp([FromBody] User user)
         {
             try
@@ -75,6 +75,22 @@ namespace FindFiddo_Server.Controllers
                 {
                     return BadRequest ("Algo ha salido mal");
                 }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpDelete]
+        [Route("user/{id}")]
+        public IActionResult DeleteUserById(Guid id)
+        {
+            try
+            {
+                _user.DeleteById(id);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -130,6 +146,88 @@ namespace FindFiddo_Server.Controllers
             {
                 _dv.UpdateUserDVTable("usuario", _user.GetAll());
                 return Ok("Restablecimiento de Digito Verificador exitoso");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("data/backup")]
+        public IActionResult GenerateBackUp()
+        {
+            try
+            {
+                bool state = _dv.GenerateBackUp();
+                if (state) {
+                    return Ok("Se ha generado el backup exitosamente");
+                }
+                else
+                {
+                    return BadRequest();
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("data/restore")]
+        public IActionResult RestoreBackUp()
+        {
+            try
+            {
+                _dv.RestoreBackUp();
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("user/{id}")]
+        public IActionResult GetUserById(Guid id)
+        {
+            try
+            {
+                var user = _user.GetById(id);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("user/log")]
+        public IActionResult GetUserLog(string from, string to, string? action, int pag)
+        {
+            try
+            {
+                DateTime desde, hasta;
+
+                if (DateTime.TryParse(from, out desde) && DateTime.TryParse(to, out hasta))
+                {
+                    var all = _user.GetLog(desde, hasta,action,pag);
+                    return Ok(all); 
+                }
+                else
+                {
+                    return BadRequest("Formato de las fechas incorrecto");
+                }
+                
             }
             catch (Exception ex)
             {

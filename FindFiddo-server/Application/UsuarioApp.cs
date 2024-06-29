@@ -2,6 +2,7 @@
 using FindFiddo.Entities;
 using FindFiddo.Repository;
 using FindFiddo.Services;
+using FindFiddo_server.Entities;
 
 namespace FindFiddo.Application
 {
@@ -10,7 +11,7 @@ namespace FindFiddo.Application
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser SignUP(User user);
-        bool UpdateDVuser(User user);
+        List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -21,9 +22,9 @@ namespace FindFiddo.Application
         }
 
 
-        public void DeleteById(int id)
+        public void DeleteById(Guid id)
         {
-            throw new NotImplementedException();
+            _repo.DeleteById(id);
         }
 
         public IList<User> GetAll()
@@ -31,9 +32,14 @@ namespace FindFiddo.Application
             return _repo.GetAll();
         }
 
-        public User GetById(int id)
+        public User GetById(Guid id)
         {
-            throw new NotImplementedException();
+            return _repo.GetById(id);
+        }
+
+        public List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag)
+        {
+            return _repo.GetLog(from, to, accion, pag);
         }
 
         public User GetUserByEmail(string email)
@@ -58,18 +64,13 @@ namespace FindFiddo.Application
 
         public LogedUser SignUP(User user)
         {
-            user.DV = DigitoVerificador.CalcularDV(user);
-
             user.salt = EncryptService.GenerateSalt();
+            user.DV = DigitoVerificador.CalcularDV(user);
             user.password = EncryptService.Compute(user.password, user.salt);
 
             return _repo.signUP(user);
         }
 
-        public bool UpdateDVuser(User user)
-        {
-            return _repo.UpdateDVuser(user);
-        }
         
     }
 }
