@@ -34,27 +34,86 @@ namespace FindFiddo_server.DataAccess
                 throw;
             }finally { _conn.Close(); }
         }
+
         public void RestoreBackUp()
         {
+            string sql = @"
+                             USE [master];
+        DECLARE @name VARCHAR(MAX) = 'FindFiddo_App'
+        DECLARE @SQL NVARCHAR(MAX)
+        DECLARE @FileNameOrgBackup NVARCHAR(MAX)
+        DECLARE @errorMessage NVARCHAR(4000)
+
+        BEGIN TRY
+            -- Encontrar el backup más reciente
+            SELECT TOP 1 @FileNameOrgBackup = mf.physical_device_name
+            FROM msdb.dbo.backupset bs
+            INNER JOIN msdb.dbo.backupmediafamily mf ON bs.media_set_id = mf.media_set_id
+            WHERE bs.database_name = @name
+              AND mf.physical_device_name LIKE @path + '%'
+              AND bs.type = 'D' -- 'D' para full database backup
+            ORDER BY bs.backup_start_date DESC
+
+            IF @FileNameOrgBackup IS NULL
+            BEGIN
+                RAISERROR('No se encontró ningún archivo de backup reciente.', 16, 1)
+                RETURN
+            END
+
+            PRINT 'Archivo de backup seleccionado: ' + @FileNameOrgBackup
+
+            -- Verificar el backup
+            PRINT 'Verificando backup...'
+            RESTORE VERIFYONLY FROM DISK = @FileNameOrgBackup
+
+            -- Restaurar la base de datos
+            PRINT 'Iniciando restauración...'
+            SET @SQL = '
+                ALTER DATABASE [' + @name + '] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                RESTORE DATABASE [' + @name + '] FROM DISK = ''' + @FileNameOrgBackup + ''' 
+                WITH REPLACE, RECOVERY, STATS = 10;
+                ALTER DATABASE [' + @name + '] SET MULTI_USER;'
+
+            EXEC sp_executesql @SQL
+
+            PRINT 'Restauración completada correctamente.'
+        END TRY
+        BEGIN CATCH
+            SET @errorMessage = ERROR_MESSAGE()
+            RAISERROR(@errorMessage, 16, 1)
+        END CATCH
+
+                        ";
+            
+            using SqlCommand cmd = new SqlCommand(sql, _conn);
+            cmd.CommandType = CommandType.Text;
+
+            SqlParameter p = new SqlParameter("path", SqlDbType.VarChar, -1);
+            p.Value = _config["BackupSettings:BackupPath"].Replace("\\", "\\\\");
+
+            cmd.Parameters.Add(p);
+
             try
             {
-                string sql = @"USE [master]
-                               EXEC dbo.bak_RestoreDB @path";
-                using SqlCommand cmd = new SqlCommand(sql, _conn);
-                cmd.CommandType = System.Data.CommandType.Text;
-
-                string path = _config["BackupSettings:BackupPath"];
-                cmd.Parameters.AddWithValue("@path", path);
-
                 _conn.Open();
                 cmd.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (SqlException ex)
             {
-
-                throw;
+                Console.WriteLine($"Error de SQL: {ex.Message}");
+                throw ex;
+                // Maneja el error apropiadamente
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error general: {ex.Message}");
+                throw ex;
+                // Maneja el error apropiadamente
+            }
+            finally { _conn.Close(); }
         }
+
+        
         public bool UpdateDVtable(string tName,string tDV)
         {
             try

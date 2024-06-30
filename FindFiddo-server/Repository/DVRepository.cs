@@ -15,7 +15,16 @@ namespace FindFiddo_server.Repository
         }
         public void RestoreBackUp()
         {
-            _ctx.RestoreBackUp();
+            try
+            {
+                _ctx.RestoreBackUp();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
         public bool UpdateDVtable(string tName,string tDV)
         {

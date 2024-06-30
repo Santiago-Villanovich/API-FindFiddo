@@ -26,7 +26,15 @@ namespace FindFiddo.Application
         }
         public void RestoreBackUp()
         {
-            _repo.RestoreBackUp();
+            try
+            {
+                _repo.RestoreBackUp();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
         }
         public IList<User> VerificarDigitoXuser(IList<User> Usuarios)
         {
