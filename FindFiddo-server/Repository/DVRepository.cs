@@ -1,4 +1,5 @@
 ﻿using FindFiddo_server.DataAccess;
+using FindFiddo_server.Entities;
 
 namespace FindFiddo_server.Repository
 {
@@ -38,6 +39,16 @@ namespace FindFiddo_server.Repository
         public bool UpdateDVuser(Guid idUsuario, string dv)
         {
             return _ctx.UpdateDVuser(idUsuario, dv);
+        }
+
+        public bool DeleteMirror()
+        {
+            return _ctx.DeleteMirror(); 
+        }
+
+        public List<MirrorUser> GetIntegrityIssues()
+        {
+            return _ctx.GetIntegrityIssues();
         }
     }
 }

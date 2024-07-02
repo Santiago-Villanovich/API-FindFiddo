@@ -67,8 +67,8 @@ namespace FindFiddo_Server.Controllers
 
                 if (UsrLoged != null)
                 {
-                    _dv.UpdateUserDVTable("usuario",_user.GetAll()); //recalculo el dv de la tabla
-
+                    _dv.UpdateDVTable("usuario",_user.GetAll()); //recalculo el dv de la tabla
+                    UsrLoged.rol = _user.GetUserRols(UsrLoged.Id);
                     return Ok(UsrLoged);
                 }
                 else
@@ -128,7 +128,7 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                var lista = _dv.VerificarDigitoXuser(_user.GetAll());
+                var lista = _dv.GetIntegrityIssues();
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -144,7 +144,8 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                _dv.UpdateUserDVTable("usuario", _user.GetAll());
+                _dv.RecalcularUserDVTable("usuario", _user.GetAll() );
+                _dv.DeleteMirror();
                 return Ok("Restablecimiento de Digito Verificador exitoso");
             }
             catch (Exception ex)
@@ -184,7 +185,8 @@ namespace FindFiddo_Server.Controllers
             try
             {
                 _dv.RestoreBackUp();
-                return Ok();
+                _dv.DeleteMirror();
+                return Ok("La base de datos se ha restaurado correctamente");
 
             }
             catch (Exception ex)

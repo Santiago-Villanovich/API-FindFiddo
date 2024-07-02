@@ -3,6 +3,7 @@ using FindFiddo.DataAccess;
 using FindFiddo.Entities;
 using FindFiddo.Repository;
 using FindFiddo.Services;
+using FindFiddo_server.Entities;
 using FindFiddo_server.Repository;
 using System;
 using System.Collections.Generic;
@@ -59,15 +60,30 @@ namespace FindFiddo.Application
            
         }
 
+        public void UpdateDVTable(string tableName, IEnumerable<IVerificable> entidades)
+        {
+            try
+            {
+                string DVTnew = DigitoVerificador.CalcularDVTabla(entidades);
+                _repo.UpdateDVtable(tableName, DVTnew);
 
-        public void UpdateUserDVTable(string tableName,IEnumerable<IVerificable> entidades)
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void RecalcularUserDVTable(string tableName,IEnumerable<IVerificable> entidades)
         {
             try
             {
                 foreach (User u in entidades)
                 {
-                    UpdateDVuser(u.Id,DigitoVerificador.CalcularDV(u));
+                    u.DV = DigitoVerificador.CalcularDV(u);
+                    UpdateDVuser(u.Id,u.DV);
                 }
+
                 string DVTnew = DigitoVerificador.CalcularDVTabla(entidades);
                 _repo.UpdateDVtable(tableName, DVTnew);
 
@@ -95,6 +111,12 @@ namespace FindFiddo.Application
         public bool UpdateDVuser(Guid idUsuario, string dv)
         {
             return _repo.UpdateDVuser(idUsuario, dv);
+        }
+        public bool DeleteMirror() {  return _repo.DeleteMirror(); }
+
+        public List<MirrorUser> GetIntegrityIssues()
+        {
+            return _repo.GetIntegrityIssues(); 
         }
     }
 }

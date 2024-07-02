@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using FindFiddo.Entities;
+using FindFiddo_server.Entities;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace FindFiddo_server.DataAccess
@@ -11,6 +13,59 @@ namespace FindFiddo_server.DataAccess
         {
             _config = configuration;
             _conn = new SqlConnection(_config.GetConnectionString("default"));
+        }
+
+        public bool DeleteMirror()
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("mrr_delete", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally { _conn.Close(); }
+        }
+
+        public List<MirrorUser> GetIntegrityIssues()
+        {
+            List<MirrorUser> issues = new List<MirrorUser> ();
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("mrr_GetIntegrityAnomalies", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    MirrorUser user = new MirrorUser()
+                    {
+                        tabla = reader["tabla"].ToString(),
+                        usuarioActual = (!reader.IsDBNull(reader.GetOrdinal("usuario_actual")))? reader["usuario_actual"].ToString() : string.Empty,
+                        usuarioMrr = (!reader.IsDBNull(reader.GetOrdinal("usuario_mrr"))) ? reader["usuario_mrr"].ToString() : string.Empty,
+                        actionType = reader["action_type"].ToString(),
+                        camposModificados = (!reader.IsDBNull(reader.GetOrdinal("campo_modificado"))) ? reader["campo_modificado"].ToString() : string.Empty
+
+                    };
+                    issues.Add(user);
+                }
+
+                return issues;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally { _conn.Close(); }
         }
 
         public bool GenerateBackUp()
