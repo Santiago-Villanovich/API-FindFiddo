@@ -94,50 +94,61 @@ namespace FindFiddo_server.DataAccess
         {
             string sql = @"
                              USE [master];
-        DECLARE @name VARCHAR(MAX) = 'FindFiddo_App'
-        DECLARE @SQL NVARCHAR(MAX)
-        DECLARE @FileNameOrgBackup NVARCHAR(MAX)
-        DECLARE @errorMessage NVARCHAR(4000)
+                             DECLARE @name VARCHAR(MAX) = 'FindFiddo_App'
+                             DECLARE @SQL NVARCHAR(MAX)
+                             DECLARE @FileNameOrgBackup NVARCHAR(MAX)
+                             DECLARE @errorMessage NVARCHAR(4000)
 
-        BEGIN TRY
-            -- Encontrar el backup más reciente
-            SELECT TOP 1 @FileNameOrgBackup = mf.physical_device_name
-            FROM msdb.dbo.backupset bs
-            INNER JOIN msdb.dbo.backupmediafamily mf ON bs.media_set_id = mf.media_set_id
-            WHERE bs.database_name = @name
-              AND mf.physical_device_name LIKE @path + '%'
-              AND bs.type = 'D' -- 'D' para full database backup
-            ORDER BY bs.backup_start_date DESC
+                             BEGIN TRY
+                                 -- Crear una tabla temporal para almacenar los nombres de archivos desde el sistema de archivos
+                                 CREATE TABLE #FileList (
+                                     Subdirectory NVARCHAR(255),
+                                     Depth INT,
+                                     FileFlag INT
+                                 );
 
-            IF @FileNameOrgBackup IS NULL
-            BEGIN
-                RAISERROR('No se encontró ningún archivo de backup reciente.', 16, 1)
-                RETURN
-            END
+	                            SET @SQL = 'INSERT INTO #FileList (Subdirectory, Depth, FileFlag) EXEC xp_dirtree ''' + @path + ''', 1, 1;';
+	                            EXEC sp_executesql @SQL;
 
-            PRINT 'Archivo de backup seleccionado: ' + @FileNameOrgBackup
+                                 -- Filtrar y ordenar solo los archivos .BAK en orden descendente
+                                 SELECT TOP 1 @FileNameOrgBackup = Subdirectory
+                                 FROM #FileList
+                                 WHERE FileFlag = 1 AND Subdirectory LIKE '%.BAK'
+                                 ORDER BY Subdirectory DESC;
 
-            -- Verificar el backup
-            PRINT 'Verificando backup...'
-            RESTORE VERIFYONLY FROM DISK = @FileNameOrgBackup
+                                 -- Limpiar la tabla temporal
+                                 DROP TABLE #FileList;
 
-            -- Restaurar la base de datos
-            PRINT 'Iniciando restauración...'
-            SET @SQL = '
-                ALTER DATABASE [' + @name + '] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                RESTORE DATABASE [' + @name + '] FROM DISK = ''' + @FileNameOrgBackup + ''' 
-                WITH REPLACE, RECOVERY, STATS = 10;
-                ALTER DATABASE [' + @name + '] SET MULTI_USER;'
+                                 -- Verificar si se encontró un archivo
+                                 IF @FileNameOrgBackup IS NULL
+                                 BEGIN
+                                     RAISERROR('No se encontró ningún archivo de backup reciente.', 16, 1);
+                                     RETURN;
+                                 END
 
-            EXEC sp_executesql @SQL
+                                 SET @FileNameOrgBackup = @path + @FileNameOrgBackup;
+                                 PRINT 'Archivo de backup seleccionado: ' + @FileNameOrgBackup
 
-            PRINT 'Restauración completada correctamente.'
-        END TRY
-        BEGIN CATCH
-            SET @errorMessage = ERROR_MESSAGE()
-            RAISERROR(@errorMessage, 16, 1)
-        END CATCH
+                                 -- Verificar el backup
+                                 PRINT 'Verificando backup...'
+                                 RESTORE VERIFYONLY FROM DISK = @FileNameOrgBackup
 
+                                 -- Restaurar la base de datos
+                                 PRINT 'Iniciando restauración...'
+                                 SET @SQL = '
+                                     ALTER DATABASE [' + @name + '] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                                     RESTORE DATABASE [' + @name + '] FROM DISK = ''' + @FileNameOrgBackup + ''' 
+                                     WITH REPLACE, RECOVERY, STATS = 10;
+                                     ALTER DATABASE [' + @name + '] SET MULTI_USER;'
+
+                                 EXEC sp_executesql @SQL
+
+                                 PRINT 'Restauración completada correctamente.'
+                             END TRY
+                             BEGIN CATCH
+                                 SET @errorMessage = ERROR_MESSAGE()
+                                 RAISERROR(@errorMessage, 16, 1)
+                             END CATCH
                         ";
             
             using SqlCommand cmd = new SqlCommand(sql, _conn);

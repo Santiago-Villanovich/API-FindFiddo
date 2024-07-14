@@ -33,6 +33,7 @@ namespace FindFiddo_Server.Controllers
                 {
                     LogedUser lUser = new LogedUser(user.Id, user.telefono, user.email, user.nombres, user.apellidos);
                     lUser.rol = _user.GetUserRols(lUser.Id);
+                    _user.InsertUserLog(user.Id,"LogIn");
                     return Ok(lUser);
                 }
                 else
@@ -54,7 +55,7 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                if (!(user.rol.Count() > 0)) //Si no tiene rol le asigno el usuario default
+                if (user.rol == null ) //Si no tiene rol le asigno el usuario default
                 {
                     user.rol = new List<Rol>
                     {

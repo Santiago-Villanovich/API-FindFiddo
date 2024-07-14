@@ -11,6 +11,7 @@ namespace FindFiddo.Application
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser SignUP(User user);
+        void InsertUserLog(Guid id, string accion);
         List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
     }
     public class UsuarioApp : IUsuarioApp
@@ -40,6 +41,11 @@ namespace FindFiddo.Application
         public List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag)
         {
             return _repo.GetLog(from, to, accion, pag);
+        }
+
+        public void InsertUserLog(Guid id, string accion)
+        {
+            _repo.InsertUserLog(id, accion);
         }
 
         public User GetUserByEmail(string email)
