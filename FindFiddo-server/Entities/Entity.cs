@@ -9,6 +9,6 @@ namespace FindFiddo.Entities
     public abstract class Entity
     {
         public Guid Id { get; set; }
-        public DateTime fechaCreacion {  get; set; }
+        public DateTime? fechaCreacion {  get; set; }
     }
 }

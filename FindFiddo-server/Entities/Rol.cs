@@ -8,7 +8,7 @@ namespace FindFiddo.Entities
 {
     public class Rol:Entity
     {
-        public string nombre { get; set; }
+        public string? nombre { get; set; }
 
         public Rol() { }
     }
