@@ -314,8 +314,8 @@ namespace FindFiddo.DataAccess
                 using SqlCommand cmd = new SqlCommand("log_GetUserFiltered", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@from", from);
-                cmd.Parameters.AddWithValue("@to", to);
+                cmd.Parameters.AddWithValue("@from", DBNull.Value);
+                cmd.Parameters.AddWithValue("@to", DBNull.Value);
                 cmd.Parameters.AddWithValue("@action", !string.IsNullOrEmpty(accion)? accion : DBNull.Value);
                 cmd.Parameters.AddWithValue("@page", pag);
 

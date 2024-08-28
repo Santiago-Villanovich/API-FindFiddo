@@ -215,7 +215,7 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("user/log")]
-        public IActionResult GetUserLog(string from, string to, string? action, int pag)
+        public IActionResult GetUserLog(string? from, string? to, string? action, int pag)
         {
             try
             {
