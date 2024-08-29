@@ -24,12 +24,12 @@ namespace FindFiddo.Repository
     }
     public class UserRepository : IUserRepository
     {
-        UserContext _ctx;
+        IUserContext _ctx;
         private readonly IConfiguration _configuration;
-        public UserRepository(IConfiguration configuration)
+        public UserRepository(IConfiguration configuration, IUserContext ctx)
         {
             _configuration = configuration;
-            _ctx = new UserContext(configuration);
+            _ctx = ctx;
         }
 
         public void DeleteById(Guid id)

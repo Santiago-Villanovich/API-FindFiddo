@@ -5,10 +5,10 @@ namespace FindFiddo_server.Repository
 {
     public class DVRepository
     {
-        DVContext _ctx;
-        public DVRepository(IConfiguration configuration) {
+        IDVContext _ctx;
+        public DVRepository(IConfiguration configuration, IDVContext ctx) {
         
-            _ctx = new DVContext(configuration);
+            _ctx = ctx;
         }
         public bool GenerateBackUp()
         {

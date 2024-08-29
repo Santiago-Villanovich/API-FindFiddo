@@ -13,10 +13,31 @@ using System.Threading.Tasks;
 
 namespace FindFiddo.Application
 {
-    public class DigitoVerificadorService
+    public interface IDigitoVerificadorService
+    {
+        bool GenerateBackUp();
+
+        void RestoreBackUp();
+
+        IList<User> VerificarDigitoXuser(IList<User> Usuarios);
+
+        void UpdateDVTable(string tableName, IEnumerable<IVerificable> entidades);
+
+        bool VerificarDigitoTable(string tableName, IEnumerable<IVerificable> entidades);
+
+        void RecalcularUserDVTable(string tableName, IEnumerable<IVerificable> entidades);
+
+        bool UpdateDVuser(Guid idUsuario, string dv);
+
+        bool DeleteMirror();
+
+        List<MirrorUser> GetIntegrityIssues();
+
+    }
+    public class DVApp: IDigitoVerificadorService
     {
         DVRepository _repo;
-        public DigitoVerificadorService(IConfiguration configuration)
+        public DVApp(IConfiguration configuration)
         {
             _repo = new DVRepository(configuration);
         }

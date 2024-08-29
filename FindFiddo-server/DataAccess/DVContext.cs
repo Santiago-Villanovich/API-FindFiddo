@@ -5,7 +5,24 @@ using System.Data.SqlClient;
 
 namespace FindFiddo_server.DataAccess
 {
-    public class DVContext
+    public interface IDVContext
+    {
+        bool DeleteMirror();
+
+        List<MirrorUser> GetIntegrityIssues();
+
+        bool GenerateBackUp();
+
+        void RestoreBackUp();
+
+        bool UpdateDVtable(string tName, string tDV);
+
+        string GetDVbyName(string tName);
+
+        bool UpdateDVuser(Guid idUsuario, string dv);
+    }
+
+    public class DVContext: IDVContext
     {
         private SqlConnection _conn;
         private readonly IConfiguration _config;
