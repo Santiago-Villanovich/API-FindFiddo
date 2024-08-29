@@ -12,6 +12,15 @@ namespace FindFiddo.Repository
         LogedUser signUP(User user);
         void InsertUserLog(Guid id, string accion);
         List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
+
+        void InsertOrganizacion(Organizacion organizacion);
+        void DeleteOrganizacion(Guid id_organizacion);
+        IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag);
+        Organizacion getOrganizacionByID(Guid id);
+
+        void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
+
+        void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
     }
     public class UserRepository : IUserRepository
     {
@@ -71,6 +80,36 @@ namespace FindFiddo.Repository
         public void InsertUserLog(Guid id, string accion)
         {
             _ctx.InsertUserLog(id, accion);
+        }
+
+        public void InsertOrganizacion(Organizacion organizacion)
+        {
+            _ctx.InsertOrganizacion(organizacion);
+        }
+
+        public void DeleteOrganizacion(Guid id_organizacion)
+        {
+             _ctx.DeleteOrganizacion(id_organizacion);
+        }
+
+        public IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag)
+        {
+           return _ctx.getOrganizaciones(from, to, accion, pag);
+        }
+
+        public Organizacion getOrganizacionByID(Guid id)
+        {
+            return _ctx.getOrganizacionByID(id);
+        }
+
+        public void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
+        {
+            _ctx.Asignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
+        }
+
+        public void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
+        {
+            _ctx.Desasignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
         }
     }
 }

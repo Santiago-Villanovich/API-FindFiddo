@@ -2,6 +2,7 @@
 using FindFiddo.Entities;
 using FindFiddo_server.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -17,6 +18,15 @@ namespace FindFiddo.DataAccess
         void InsertUserLog(Guid idUser, string accion);
         List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
         void InsertUserRol(Guid idUser, List<Rol> roles);
+
+        void InsertOrganizacion(Organizacion organizacion);
+        void DeleteOrganizacion(Guid id_organizacion);
+        IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag);
+        Organizacion getOrganizacionByID(Guid id);
+
+        void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
+
+        void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
     }
     public class UserContext : IUserContext
     {
@@ -349,6 +359,195 @@ namespace FindFiddo.DataAccess
                 throw;
             }
             finally { _conn.Close(); }
+        }
+
+        public void InsertOrganizacion(Organizacion organizacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("insert_organizacion", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                _conn.Open();
+                
+               
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@idOrganizacion", organizacion.Id);
+                cmd.Parameters.AddWithValue("@direccion", organizacion.direccion);
+                cmd.Parameters.AddWithValue("@fecha_creacion", organizacion.fechaCreacion);
+                cmd.Parameters.AddWithValue("@razon_social", organizacion.razon_social);
+                cmd.Parameters.AddWithValue("@codigo_postal", organizacion.codigo_postal);
+                cmd.Parameters.AddWithValue("@digito_Verificador", organizacion.digito_verificador);
+                cmd.Parameters.AddWithValue("@nombre", organizacion.nombre);
+
+                cmd.ExecuteNonQuery();
+               
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public void DeleteOrganizacion(Guid id_organizacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("usr_DeleteOrganizacion", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@idOrganizacion", id_organizacion);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _conn.Close();
+            }
+        }
+
+        public IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag)
+        {
+            List<Organizacion> list = new List<Organizacion>();
+            try
+            {
+                Organizacion org = null;
+
+                using SqlCommand cmd = new SqlCommand("get_all_organizaciones", _conn);
+
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@from", DBNull.Value);
+                cmd.Parameters.AddWithValue("@to", DBNull.Value);
+                cmd.Parameters.AddWithValue("@action", !string.IsNullOrEmpty(accion) ? accion : DBNull.Value);
+                cmd.Parameters.AddWithValue("@page", pag);
+
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    org = new Organizacion()
+                    {
+                        Id = reader.GetGuid("id_org"),
+                        nombre = reader.GetString("nombre"),
+                        razon_social=reader.GetString("razon_social"),
+                        direccion=reader.GetString("direccion"),
+                        codigo_postal=reader.GetInt32("codigo_postal"),
+                        digito_verificador=reader.GetString("digito_verificador"),
+                        fechaCreacion = Convert.ToDateTime(reader["fecha_creacion"])
+                       
+                    };
+
+                    list.Add(org);
+                }
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
+        }
+
+        public Organizacion getOrganizacionByID(Guid id)
+        {
+            List<Organizacion> list = new List<Organizacion>();
+            try
+            {
+                Organizacion org = null;
+
+                using SqlCommand cmd = new SqlCommand("get_organizacion_by_id", _conn);
+
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id",id);
+
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    org = new Organizacion()
+                    {
+                        Id = reader.GetGuid("id_org"),
+                        nombre = reader.GetString("nombre"),
+                        razon_social = reader.GetString("razon_social"),
+                        direccion = reader.GetString("direccion"),
+                        codigo_postal = reader.GetInt32("codigo_postal"),
+                        digito_verificador = reader.GetString("digito_verificador"),
+                        fechaCreacion = Convert.ToDateTime(reader["fecha_creacion"])
+
+                    };
+
+                   
+                }
+                return org;
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
+        }
+
+        public void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("Asignar_usuario_organizacion", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@idUser", Id_ususario);
+                cmd.Parameters.AddWithValue("@idOrg", Id_organizacion);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _conn.Close();
+            }
+        }
+
+        public void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("desasignar_usuario_organizacion", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@idUser", Id_ususario);
+                cmd.Parameters.AddWithValue("@idOrg", Id_organizacion);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _conn.Close();
+            }
         }
     }
 }

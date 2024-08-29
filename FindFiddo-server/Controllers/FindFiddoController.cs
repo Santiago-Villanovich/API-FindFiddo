@@ -3,6 +3,7 @@ using FindFiddo.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FindFiddo.Services;
+using FindFiddo_server.Services;
 
 namespace FindFiddo_Server.Controllers
 {
@@ -13,12 +14,13 @@ namespace FindFiddo_Server.Controllers
         private readonly ILogger<FindFiddoController> _logger;
         private DigitoVerificadorService _dv;
         private UsuarioApp _user;
-
+        private SessionManager _singleton;
         public FindFiddoController(IConfiguration config, ILogger<FindFiddoController> logger)
         {
             _logger = logger;
             _user = new UsuarioApp(config);
             _dv = new DigitoVerificadorService(config);
+           // _singleton = new SessionManager();
         }
 
         [AllowAnonymous]
@@ -34,6 +36,7 @@ namespace FindFiddo_Server.Controllers
                     LogedUser lUser = new LogedUser(user.Id, user.telefono, user.email, user.nombres, user.apellidos);
                     lUser.rol = _user.GetUserRols(lUser.Id);
                     _user.InsertUserLog(user.Id,"LogIn");
+                    SessionManager.Login(user);
                     return Ok(lUser);
                 }
                 else
@@ -70,6 +73,7 @@ namespace FindFiddo_Server.Controllers
                 {
                     _dv.UpdateDVTable("usuario",_user.GetAll()); //recalculo el dv de la tabla
                     UsrLoged.rol = _user.GetUserRols(UsrLoged.Id);
+                    SessionManager.Login(user);
                     return Ok(UsrLoged);
                 }
                 else
@@ -82,6 +86,39 @@ namespace FindFiddo_Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("logOut")]
+        public IActionResult LogOut()
+        {
+            try
+            {
+                SessionManager.Logout();
+                return Ok("Se realizo el log out con exito");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("session/data")]
+        public IActionResult Session_data()
+        {
+            try
+            {
+               SessionManager session = SessionManager.GetInstance;
+                return Ok(session);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [AllowAnonymous]
         [HttpDelete]
@@ -137,6 +174,8 @@ namespace FindFiddo_Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        
 
         [AllowAnonymous]
         [HttpPost]
@@ -231,6 +270,81 @@ namespace FindFiddo_Server.Controllers
                     return BadRequest("Formato de las fechas incorrecto");
                 }
                 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("organizacion/get_all")]
+        public IActionResult GetAllOrganizaciones(string? from, string? to, string? action, int pag)
+        {
+            try
+            {
+                DateTime desde, hasta;
+
+                if (DateTime.TryParse(from, out desde) && DateTime.TryParse(to, out hasta))
+                {
+                    var all = _user.getOrganizaciones(desde, hasta, action, pag);
+                    return Ok(all);
+                }
+                else
+                {
+                    return BadRequest("Formato de las fechas incorrecto");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("organizacion/{id}")]
+        public IActionResult GetOrganizacionById(Guid id)
+        {
+            try
+            {
+                var org = _user.getOrganizacionByID(id);
+                return Ok(org);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("organizacion/asignarUser")]
+        public IActionResult Asignar_user_organizacion(Guid Id_user,Guid Id_org)
+        {
+            try
+            {
+                _user.Asignar_Usuario_Organizacion(Id_user, Id_org);
+                return Ok("Se asigno el ususario a la organizacion :"+Id_org);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("organizacion/desasignarUser")]
+        public IActionResult Desasignar_user_organizacion(Guid Id_user,Guid Id_org)
+        {
+            try
+            {
+                _user.Desasignar_Usuario_Organizacion(Id_user, Id_org);
+                return Ok("Se desasigno el ususario" + Id_user+" a la organizacion :" + Id_org);
+
             }
             catch (Exception ex)
             {
