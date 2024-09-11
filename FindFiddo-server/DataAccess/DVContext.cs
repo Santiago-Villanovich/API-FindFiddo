@@ -26,6 +26,7 @@ namespace FindFiddo_server.DataAccess
     {
         private SqlConnection _conn;
         private readonly IConfiguration _config;
+
         public DVContext(IConfiguration configuration)
         {
             _config = configuration;

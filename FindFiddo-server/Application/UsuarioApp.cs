@@ -25,10 +25,10 @@ namespace FindFiddo.Application
     }
     public class UsuarioApp : IUsuarioApp
     {
-        UserRepository _repo;
-        public UsuarioApp(IConfiguration configuration)
+        IUserRepository _repo;
+        public UsuarioApp(IUserRepository repo)
         {
-            _repo = new UserRepository(configuration);
+            _repo = repo;
         }
 
 

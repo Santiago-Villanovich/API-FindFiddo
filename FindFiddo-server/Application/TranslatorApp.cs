@@ -12,7 +12,7 @@ namespace FindFiddo_server.Application
         bool InsertIdioma(Idioma idioma);
         bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma);
     }
-    public class TranslatorApp
+    public class TranslatorApp: ITranslatorApp
     {
         ITranslatorRepository _repo;
         public TranslatorApp(ITranslatorRepository repo) 

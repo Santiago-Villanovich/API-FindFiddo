@@ -12,14 +12,14 @@ namespace FindFiddo_Server.Controllers
     public class FindFiddoController : ControllerBase
     {
         private readonly ILogger<FindFiddoController> _logger;
-        private IDigitoVerificadorService _dv;
+        private IDVService _dv;
         private IUsuarioApp _user;
 
-        public FindFiddoController(IConfiguration config, ILogger<FindFiddoController> logger, IDigitoVerificadorService dvService ,IUsuarioApp usuarioApp)
+        public FindFiddoController(ILogger<FindFiddoController> logger, IDVService dv ,IUsuarioApp user)
         {
             _logger = logger;
-            _user = new UsuarioApp(config);
-            _dv = new DigitoVerificadorService(config);
+            _user = user;
+            _dv = dv;
         }
 
        
