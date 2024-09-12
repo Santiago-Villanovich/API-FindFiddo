@@ -5,12 +5,17 @@ namespace FindFiddo_server.Application
 {
     public interface ITranslatorApp
     {
-        Idioma ObtenerIdiomaDefault();
-        List<Idioma> ObtenerIdiomas();
-        IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma);
-        List<Traduccion> GetAllTerminos(Idioma idioma = null);
-        bool InsertIdioma(Idioma idioma);
-        bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma);
+        Idioma GetIdiomaDefault();
+
+        List<Idioma> GetAllIdiomas();
+
+        IDictionary<string, Traduccion> GetAllTraducciones(Idioma idioma);
+
+        List<Termino> GetAllTerminos(Idioma idioma = null);
+
+        bool SaveOrUpdateIdioma(Idioma idioma);
+
+        bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma);
     }
     public class TranslatorApp: ITranslatorApp
     {
@@ -20,145 +25,85 @@ namespace FindFiddo_server.Application
             _repo = repo;   
         }
 
-        public bool InsertIdioma(Idioma idioma)
+        public List<Idioma> GetAllIdiomas()
         {
             try
             {
-                return _repo.InsertIdioma(idioma);
+                return _repo.GetAllIdiomas();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw;
-            }
 
-        }
-        public Idioma ObtenerIdiomaDefault()
-        {
-            try
-            {
-                return _repo.ObtenerIdiomaDefault();
-            }
-            catch (Exception e)
-            {
                 throw;
             }
         }
 
-        public List<Idioma> ObtenerIdiomas()
+        public List<Termino> GetAllTerminos(Idioma idioma = null)
         {
             try
             {
-                return _repo.ObtenerIdiomas();
+                return _repo.GetAllTerminos(idioma);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
-            }
-        }
 
-        public IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma)
-        {
-            try
-            {
-                IDictionary<string, ITraduccion> traducciones = new DAL_Traductor().ObtenerTraducciones(idioma);
-                IDictionary<string, ITraduccion> traDefault = new DAL_Traductor().ObtenerTraducciones(ObtenerIdiomaDefault());
-                foreach (var item in traducciones)
-                {
-                    if (item.Value.texto == "" || item.Value.texto == null)
-                    {
-                        item.Value.texto = traDefault[item.Key].texto;
-                    }
-                }
-                return traducciones;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-        }
-
-        public bool InsertTraducciones(List<Traduccion> lista, Idioma idioma)
-        {
-            try
-            {
-                return new DAL_Traductor().InsertTraduccion(lista, idioma);
-            }
-            catch (Exception e)
-            {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
                 throw;
             }
-
         }
 
-        public bool UpdateTraducciones(List<Traduccion> lista, Idioma idioma)
+        public IDictionary<string, Traduccion> GetAllTraducciones(Idioma idioma)
         {
             try
             {
-                return new DAL_Traductor().UpdateTraduccion(lista, idioma);
+                return _repo.GetAllTraducciones(idioma);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
+
                 throw;
             }
-
+            
         }
 
-        public List<Traduccion> GetAllTerminos()
+        public Idioma GetIdiomaDefault()
         {
             try
             {
-                return new DAL_Traductor().GetAllTerminos();
+                return _repo.GetIdiomaDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
+
                 throw;
             }
-
+            
         }
 
-        public List<TraduccionDTO> GetAllTerminosDTO(Idioma idioma = null)
+        public bool SaveOrUpdateIdioma(Idioma idioma)
         {
             try
             {
-                List<TraduccionDTO> traduccionDTOs = new List<TraduccionDTO>();
-                foreach (var item in new DAL_Traductor().GetAllTerminos(idioma))
-                {
-                    traduccionDTOs.Add(new TraduccionDTO
-                    {
-                        id = item.termino.id,
-                        termino = item.termino.termino,
-                        traduccion = item.texto
-                    }
-                    );
-                }
-                return traduccionDTOs;
+                return _repo.SaveOrUpdateIdioma(idioma);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
+
                 throw;
             }
+        }
 
+        public bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma)
+        {
+            try
+            {
+                return _repo.SaveOrUpdateTraducciones(traducciones, idioma);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
     }
 }

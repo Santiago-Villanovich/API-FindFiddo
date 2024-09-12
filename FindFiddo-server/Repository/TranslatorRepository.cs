@@ -7,12 +7,17 @@ namespace FindFiddo_server.Repository
 {
     public interface ITranslatorRepository
     {
-        Idioma ObtenerIdiomaDefault();
-        List<Idioma> ObtenerIdiomas();
-        IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma);
-        List<Traduccion> GetAllTerminos(Idioma idioma = null);
-        bool InsertIdioma(Idioma idioma);
-        bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma);
+        Idioma GetIdiomaDefault();
+
+        List<Idioma> GetAllIdiomas();
+
+        IDictionary<string, Traduccion> GetAllTraducciones(Idioma idioma);
+
+        List<Termino> GetAllTerminos(Idioma idioma = null);
+
+        bool SaveOrUpdateIdioma(Idioma idioma);
+
+        bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma);
     }
     public class TranslatorRepository : ITranslatorRepository
     {
@@ -21,7 +26,21 @@ namespace FindFiddo_server.Repository
         {
             _ctx = ctx;
         }
-        public List<Traduccion> GetAllTerminos(Idioma idioma = null)
+
+        public List<Idioma> GetAllIdiomas()
+        {
+            try
+            {
+                return _ctx.GetAllIdiomas();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public List<Termino> GetAllTerminos(Idioma idioma = null)
         {
             try
             {
@@ -34,11 +53,11 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public bool InsertIdioma(Idioma idioma)
+        public IDictionary<string, Traduccion> GetAllTraducciones(Idioma idioma)
         {
             try
             {
-                return _ctx.InsertIdioma(idioma);
+                return _ctx.GetAllTraducciones(idioma);
             }
             catch (Exception)
             {
@@ -47,11 +66,25 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma)
+        public Idioma GetIdiomaDefault()
         {
             try
             {
-                return _ctx.SaveTraduccion(traduc, idioma);
+                return _ctx.GetIdiomaDefault();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
+        }
+
+        public bool SaveOrUpdateIdioma(Idioma idioma)
+        {
+            try
+            {
+                return _ctx.SaveOrUpdateIdioma(idioma);
             }
             catch (Exception)
             {
@@ -60,36 +93,22 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public Idioma ObtenerIdiomaDefault()
-        {
-            return _ctx.ObtenerIdiomaDefault();
-        }
-
-        public List<Idioma> ObtenerIdiomas()
+        public bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma)
         {
             try
             {
-                return _ctx.ObtenerIdiomas();
+                foreach (Traduccion t in traducciones)
+                {
+                    _ctx.SaveOrUpdateTraduccion(t, idioma);
+                }
+
+                return true;
             }
             catch (Exception)
             {
-
                 throw;
             }
+            
         }
-
-        public IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma)
-        {
-            try
-            {
-                return _ctx.ObtenerTraducciones(idioma);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
     }
 }
