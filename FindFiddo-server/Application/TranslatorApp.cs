@@ -7,12 +7,12 @@ namespace FindFiddo_server.Application
     {
         Idioma ObtenerIdiomaDefault();
         List<Idioma> ObtenerIdiomas();
-        IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma);
+        IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma);
         List<Traduccion> GetAllTerminos(Idioma idioma = null);
-        bool InsertIdioma(Idioma idioma);
-        bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma);
+        bool SaveIdioma(Idioma idioma);
+        bool SaveTraduccion(List<Traduccion> lista, Idioma idioma);
     }
-    public class TranslatorApp
+    public class TranslatorApp: ITranslatorApp
     {
         ITranslatorRepository _repo;
         public TranslatorApp(ITranslatorRepository repo) 
@@ -20,7 +20,7 @@ namespace FindFiddo_server.Application
             _repo = repo;   
         }
 
-        public bool InsertIdioma(Idioma idioma)
+        public bool SaveIdioma(Idioma idioma)
         {
             try
             {
@@ -56,19 +56,12 @@ namespace FindFiddo_server.Application
             }
         }
 
-        public IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma)
+        public IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma)
         {
             try
             {
-                IDictionary<string, ITraduccion> traducciones = new DAL_Traductor().ObtenerTraducciones(idioma);
-                IDictionary<string, ITraduccion> traDefault = new DAL_Traductor().ObtenerTraducciones(ObtenerIdiomaDefault());
-                foreach (var item in traducciones)
-                {
-                    if (item.Value.texto == "" || item.Value.texto == null)
-                    {
-                        item.Value.texto = traDefault[item.Key].texto;
-                    }
-                }
+                IDictionary<string, Traduccion> traducciones = _repo.ObtenerTraducciones(idioma);
+                
                 return traducciones;
             }
             catch (Exception e)
@@ -78,55 +71,28 @@ namespace FindFiddo_server.Application
 
         }
 
-        public bool InsertTraducciones(List<Traduccion> lista, Idioma idioma)
+        public bool SaveTraduccion(List<Traduccion> lista, Idioma idioma)
         {
             try
             {
-                return new DAL_Traductor().InsertTraduccion(lista, idioma);
+                return _repo.SaveTraduccion(lista, idioma);
             }
             catch (Exception e)
             {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
                 throw;
             }
 
         }
 
-        public bool UpdateTraducciones(List<Traduccion> lista, Idioma idioma)
+
+        public List<Traduccion> GetAllTerminos(Idioma idioma = null)
         {
             try
             {
-                return new DAL_Traductor().UpdateTraduccion(lista, idioma);
+                return _repo.GetAllTerminos(idioma);
             }
             catch (Exception e)
             {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
-                throw;
-            }
-
-        }
-
-        public List<Traduccion> GetAllTerminos()
-        {
-            try
-            {
-                return new DAL_Traductor().GetAllTerminos();
-            }
-            catch (Exception e)
-            {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
                 throw;
             }
 
@@ -137,7 +103,7 @@ namespace FindFiddo_server.Application
             try
             {
                 List<TraduccionDTO> traduccionDTOs = new List<TraduccionDTO>();
-                foreach (var item in new DAL_Traductor().GetAllTerminos(idioma))
+                foreach (var item in _repo.GetAllTerminos(idioma))
                 {
                     traduccionDTOs.Add(new TraduccionDTO
                     {
@@ -151,14 +117,10 @@ namespace FindFiddo_server.Application
             }
             catch (Exception e)
             {
-                var bitacora = new Bitacora();
-                bitacora.Detalle = e.Message;
-                bitacora.Responsable = Session.GetInstance.Usuario;
-                bitacora.Tipo = Convert.ToInt32(BitacoraTipoEnum.Error);
-                new BLL_Bitacora().Insert(bitacora);
                 throw;
             }
 
         }
+
     }
 }

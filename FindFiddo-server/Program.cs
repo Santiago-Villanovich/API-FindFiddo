@@ -1,5 +1,6 @@
 using FindFiddo.Application;
 using FindFiddo.DataAccess;
+using FindFiddo_server.Application;
 using FindFiddo_server.DataAccess;
 using FindFiddo_server.Repository;
 
@@ -12,11 +13,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IDigitoVerificadorService, DVApp>();
-
-builder.Services.AddScoped<ITranslatorContext, TranslatorContext>();
+builder.Services.AddScoped<ITranslatorApp, TranslatorApp>();
 builder.Services.AddScoped<ITranslatorRepository, TranslatorRepository>();
+builder.Services.AddScoped<ITranslatorContext, TranslatorContext>();
 
+builder.Services.AddScoped<IDigitoVerificadorService, DVApp>();
+builder.Services.AddScoped<IDVRepository, DVRepository>();
 builder.Services.AddScoped<IDVContext, DVContext>();
 
 builder.Services.AddScoped<IUsuarioApp, UsuarioApp>();

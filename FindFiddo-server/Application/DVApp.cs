@@ -36,10 +36,10 @@ namespace FindFiddo.Application
     }
     public class DVApp: IDigitoVerificadorService
     {
-        DVRepository _repo;
-        public DVApp(IConfiguration configuration)
+        IDVRepository _repo;
+        public DVApp(IDVRepository repo)
         {
-            _repo = new DVRepository(configuration);
+            _repo = repo;
         }
 
         public bool GenerateBackUp()

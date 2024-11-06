@@ -8,7 +8,7 @@ namespace FindFiddo_server.DataAccess
     {
         Idioma ObtenerIdiomaDefault();
         List<Idioma> ObtenerIdiomas();
-        IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma);
+        IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma);
         List<Traduccion> GetAllTerminos(Idioma idioma = null);
         bool InsertIdioma(Idioma idioma);
         bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma);
@@ -107,15 +107,10 @@ namespace FindFiddo_server.DataAccess
             }
         }
 
-        public IDictionary<string, Traduccion> ObtenerTraducciones(Idioma idioma)
+        public IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma)
         {
 
-            if (idioma == null)
-            {
-                idioma = ObtenerIdiomaDefault();
-            }
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
             {
                 IDataReader reader = null;
                 IDictionary<string, Traduccion> _traducciones = new Dictionary<string, Traduccion>();
@@ -124,7 +119,7 @@ namespace FindFiddo_server.DataAccess
 
                     SqlCommand cmd = new SqlCommand("sp_GetAllTraducciones", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@IdIdioma", idioma.Id);
+                    cmd.Parameters.AddWithValue("@IdIdioma", idioma);
                     conn.Open();
 
                     reader = cmd.ExecuteReader();
@@ -233,9 +228,15 @@ namespace FindFiddo_server.DataAccess
             using (SqlConnection conn = _conn)
             {
 
-                SqlCommand cmd = new SqlCommand("sp_InsertIdioma", conn);
+                if (idioma.Id == Guid.Empty)
+                {
+                    idioma.Id = Guid.NewGuid();
+                }
+
+                SqlCommand cmd = new SqlCommand("lng_SaveIdioma", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Nom", idioma.nombre);
+                cmd.Parameters.AddWithValue("@id", idioma.Id);
+                cmd.Parameters.AddWithValue("@descripcion", idioma.descripcion);
                 cmd.Connection = conn;
                 conn.Open();
 

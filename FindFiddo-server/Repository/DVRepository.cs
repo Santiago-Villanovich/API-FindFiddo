@@ -3,10 +3,20 @@ using FindFiddo_server.Entities;
 
 namespace FindFiddo_server.Repository
 {
-    public class DVRepository
+    public interface IDVRepository
+    {
+        bool GenerateBackUp();
+        void RestoreBackUp();
+        bool UpdateDVtable(string tName, string tDV);
+        string GetDVbyName(string tName);
+        bool UpdateDVuser(Guid idUsuario, string dv);
+        bool DeleteMirror();
+        List<MirrorUser> GetIntegrityIssues();
+    }
+    public class DVRepository: IDVRepository
     {
         IDVContext _ctx;
-        public DVRepository(IConfiguration configuration, IDVContext ctx) {
+        public DVRepository(IDVContext ctx) {
         
             _ctx = ctx;
         }

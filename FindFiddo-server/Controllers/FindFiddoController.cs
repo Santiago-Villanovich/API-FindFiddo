@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FindFiddo.Services;
 using FindFiddo_server.Services;
+using FindFiddo_server.Application;
+using FindFiddo_server.Entities;
 
 namespace FindFiddo_Server.Controllers
 {
@@ -14,12 +16,20 @@ namespace FindFiddo_Server.Controllers
         private readonly ILogger<FindFiddoController> _logger;
         private IDigitoVerificadorService _dv;
         private IUsuarioApp _user;
+        private ITranslatorApp _translate;
 
-        public FindFiddoController(IConfiguration config, ILogger<FindFiddoController> logger, IDigitoVerificadorService dvService ,IUsuarioApp usuarioApp)
+        public FindFiddoController
+        (
+            ILogger<FindFiddoController> logger, 
+            IDigitoVerificadorService dvService ,
+            IUsuarioApp usuarioApp,
+            ITranslatorApp translate
+        )
         {
             _logger = logger;
-            _user = new UsuarioApp(config);
-            _dv = new DigitoVerificadorService(config);
+            _user = usuarioApp;
+            _dv = dvService;
+            _translate = translate;
         }
 
        
@@ -303,6 +313,7 @@ namespace FindFiddo_Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [AllowAnonymous]
         [HttpGet]
         [Route("organizacion/{id}")]
@@ -346,6 +357,70 @@ namespace FindFiddo_Server.Controllers
                 _user.Desasignar_Usuario_Organizacion(Id_user, Id_org);
                 return Ok("Se desasigno el ususario" + Id_user+" a la organizacion :" + Id_org);
 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("idiomas")]
+        public IActionResult GetAllIdiomas()
+        {
+            try
+            {
+                var all = _translate.ObtenerIdiomas();
+                return Ok(all);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("idiomas/{idioma}/traducciones")]
+        public IActionResult GetIdiomaByUser(Guid idioma)
+        {
+            try
+            {
+                var all = _translate.ObtenerTraducciones(idioma);
+                return Ok(all);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("idiomas/terminos")]
+        public IActionResult GetAllTerminos(Guid idioma)
+        {
+            try
+            {
+                var all = _translate.GetAllTerminos();
+                return Ok(all);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("idiomas")]
+        public IActionResult GetAllTerminos(Idioma idioma)
+        {
+            try
+            {
+                var status = _translate.SaveIdioma(idioma);
+                return Ok(status);
             }
             catch (Exception ex)
             {
