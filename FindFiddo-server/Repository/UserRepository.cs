@@ -25,10 +25,8 @@ namespace FindFiddo.Repository
     public class UserRepository : IUserRepository
     {
         IUserContext _ctx;
-        private readonly IConfiguration _configuration;
-        public UserRepository(IConfiguration configuration, IUserContext ctx)
+        public UserRepository(IUserContext ctx)
         {
-            _configuration = configuration;
             _ctx = ctx;
         }
 

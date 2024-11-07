@@ -14,7 +14,7 @@ namespace FindFiddo_Server.Controllers
     public class FindFiddoController : ControllerBase
     {
         private readonly ILogger<FindFiddoController> _logger;
-        private IDigitoVerificadorService _dv;
+        private IDVService _dv;
         private IUsuarioApp _user;
         private ITranslatorApp _translate;
 

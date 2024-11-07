@@ -1,8 +1,9 @@
-﻿namespace FindFiddo_server.Entities
+﻿using FindFiddo.Entities;
+
+namespace FindFiddo_server.Entities
 {
-    public class Termino
+    public class Termino:Entity
     {
-        public int id { get; set; }
         public string termino { get; set; }
     }
 }

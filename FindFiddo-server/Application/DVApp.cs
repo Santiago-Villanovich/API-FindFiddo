@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace FindFiddo.Application
 {
-    public interface IDigitoVerificadorService
+    public interface IDVService
     {
         bool GenerateBackUp();
 
@@ -34,7 +34,7 @@ namespace FindFiddo.Application
         List<MirrorUser> GetIntegrityIssues();
 
     }
-    public class DVApp: IDigitoVerificadorService
+    public class DVApp: IDVService
     {
         IDVRepository _repo;
         public DVApp(IDVRepository repo)

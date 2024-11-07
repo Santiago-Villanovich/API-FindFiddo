@@ -24,35 +24,25 @@ namespace FindFiddo_server.Application
         {
             try
             {
-                return _repo.InsertIdioma(idioma);
+                return _repo.GetAllIdiomas();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw;
-            }
 
-        }
-        public Idioma ObtenerIdiomaDefault()
-        {
-            try
-            {
-                return _repo.ObtenerIdiomaDefault();
-            }
-            catch (Exception e)
-            {
                 throw;
             }
         }
 
-        public List<Idioma> ObtenerIdiomas()
+        public List<Termino> GetAllTerminos(Idioma idioma = null)
         {
             try
             {
-                return _repo.ObtenerIdiomas();
+                return _repo.GetAllTerminos(idioma);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+
+                throw;
             }
         }
 
@@ -64,10 +54,8 @@ namespace FindFiddo_server.Application
                 
                 return traducciones;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
-            }
 
         }
 
@@ -91,14 +79,13 @@ namespace FindFiddo_server.Application
             {
                 return _repo.GetAllTerminos(idioma);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }
-
         }
 
-        public List<TraduccionDTO> GetAllTerminosDTO(Idioma idioma = null)
+        public bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma)
         {
             try
             {
@@ -115,11 +102,11 @@ namespace FindFiddo_server.Application
                 }
                 return traduccionDTOs;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }
-
+            
         }
 
     }

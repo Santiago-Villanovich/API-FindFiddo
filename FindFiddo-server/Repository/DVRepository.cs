@@ -1,4 +1,6 @@
-﻿using FindFiddo_server.DataAccess;
+﻿using FindFiddo.Abstractions;
+using FindFiddo.Entities;
+using FindFiddo_server.DataAccess;
 using FindFiddo_server.Entities;
 
 namespace FindFiddo_server.Repository
@@ -6,24 +8,33 @@ namespace FindFiddo_server.Repository
     public interface IDVRepository
     {
         bool GenerateBackUp();
+
         void RestoreBackUp();
+
         bool UpdateDVtable(string tName, string tDV);
-        string GetDVbyName(string tName);
+
         bool UpdateDVuser(Guid idUsuario, string dv);
+
         bool DeleteMirror();
+
+        string GetDVbyName(string tName);
+
         List<MirrorUser> GetIntegrityIssues();
     }
-    public class DVRepository: IDVRepository
+
+    public class DVRepository:IDVRepository
     {
         IDVContext _ctx;
         public DVRepository(IDVContext ctx) {
         
             _ctx = ctx;
         }
+
         public bool GenerateBackUp()
         {
             return _ctx.GenerateBackUp();
         }
+
         public void RestoreBackUp()
         {
             try
