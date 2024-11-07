@@ -22,6 +22,10 @@ namespace FindFiddo.Application
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
 
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
+
+        void InsertPublicacion(Publicacion publicacion);
+
+        IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -119,6 +123,16 @@ namespace FindFiddo.Application
         public void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
         {
             _repo.Desasignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
+        }
+
+        public void InsertPublicacion(Publicacion publicacion)
+        {
+            _repo.InsertPublicacion(publicacion);
+        }
+
+        public IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag)
+        {
+            return _repo.GetPublicaciones(from, to, tipo, pag);
         }
     }
 }

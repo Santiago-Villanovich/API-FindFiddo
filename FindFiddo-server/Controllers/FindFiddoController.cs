@@ -427,5 +427,79 @@ namespace FindFiddo_Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("organizacion/XML")]
+        public IActionResult Exportar_a_XML(Guid Id_organizacion)
+        {
+            try
+            {
+                Organizacion org = _user.getOrganizacionByID(Id_organizacion);
+
+                string xml = XMLservice.generateXML(org);
+                return Ok(xml);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("organizacion/XML")]
+        public IActionResult Importar_XML(string xml)
+        {
+            try
+            {
+
+                Organizacion org = XMLservice.deserializarXML(xml);
+                _user.InsertOrganizacion(org);
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("publicacion/save")]
+        public IActionResult save_publicacion([FromBody] Publicacion publi)
+        {
+            try
+            {
+
+                _user.InsertPublicacion(publi);
+                return Ok("Publicacion guardada maquina");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("publicacion")]
+        public IActionResult get_publicaciones(DateTime from, DateTime to, string tipo, int pag)
+        {
+            try
+            {
+
+               IList<Publicacion> publicaciones = _user.GetPublicaciones(from, to, tipo, pag);  
+                return Ok(publicaciones);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

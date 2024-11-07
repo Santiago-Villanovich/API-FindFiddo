@@ -21,6 +21,9 @@ namespace FindFiddo.Repository
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
 
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
+        void InsertPublicacion(Publicacion publicacion);
+        IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
+    
     }
     public class UserRepository : IUserRepository
     {
@@ -108,6 +111,16 @@ namespace FindFiddo.Repository
         public void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
         {
             _ctx.Desasignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
+        }
+
+        public void InsertPublicacion(Publicacion publicacion)
+        {
+            _ctx.InsertPublicacion(publicacion);
+        }
+
+        public IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag)
+        {
+            return _ctx.GetPublicaciones(from,to,tipo,pag);
         }
     }
 }

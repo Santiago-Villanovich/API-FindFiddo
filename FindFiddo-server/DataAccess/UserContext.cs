@@ -27,6 +27,11 @@ namespace FindFiddo.DataAccess
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
 
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
+
+        void InsertPublicacion(Publicacion publicacion);
+
+        IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
+    
     }
     public class UserContext : IUserContext
     {
@@ -548,6 +553,77 @@ namespace FindFiddo.DataAccess
             {
                 _conn.Close();
             }
+        }
+
+        public void InsertPublicacion(Publicacion publicacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("insert_organizacion", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                _conn.Open();
+
+
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@id_publicacion", publicacion.Id);
+                cmd.Parameters.AddWithValue("@ubicacion", publicacion.ubicacion);
+                cmd.Parameters.AddWithValue("@fecha_creacion", publicacion.fechaCreacion);
+                cmd.Parameters.AddWithValue("@insert_time", DateTime.Now);
+                cmd.Parameters.AddWithValue("@tipo", publicacion.tipo);
+                cmd.Parameters.AddWithValue("@descripcion", publicacion.descripcion);
+                
+
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag)
+        {
+            try
+            {
+                IList<Publicacion> Publicaciones = new List<Publicacion>();
+
+                using SqlCommand cmd = new SqlCommand("usr_Publicacion", _conn);
+
+                cmd.Parameters.AddWithValue("@from", from);
+                cmd.Parameters.AddWithValue("@to", to);
+                cmd.Parameters.AddWithValue("@tipo", tipo);
+                cmd.Parameters.AddWithValue("@pag", pag);
+
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    
+                    Publicacion publi = new Publicacion();
+                    publi.Id = reader.GetGuid(reader.GetOrdinal("id_publicacion"));
+                    publi.descripcion = (string)reader["descripcion"];
+                    publi.tipo= (string)reader["tipo"];
+                    publi.historia = (string)reader["historia"];
+                    publi.fechaCreacion = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
+                    publi.Fecha_Alta = reader.GetDateTime(reader.GetOrdinal("fecha_alta"));
+                    publi.ubicacion = reader.GetString("ubicacion");
+                    
+                }
+
+                return Publicaciones;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
         }
     }
 }
