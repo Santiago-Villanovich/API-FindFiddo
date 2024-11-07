@@ -21,7 +21,7 @@ namespace FindFiddo_Server.Controllers
         public FindFiddoController
         (
             ILogger<FindFiddoController> logger, 
-            IDigitoVerificadorService dvService ,
+            IDVService dvService,
             IUsuarioApp usuarioApp,
             ITranslatorApp translate
         )
@@ -366,28 +366,12 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("idiomas")]
-        public IActionResult GetAllIdiomas()
-        {
-            try
-            {
-                var all = _translate.ObtenerIdiomas();
-                return Ok(all);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet]
         [Route("idiomas/{idioma}/traducciones")]
         public IActionResult GetIdiomaByUser(Guid idioma)
         {
             try
             {
-                var all = _translate.ObtenerTraducciones(idioma);
+                var all = _translate.GetAllTraducciones(idioma);
                 return Ok(all);
             }
             catch (Exception ex)
@@ -399,7 +383,7 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("idiomas/terminos")]
-        public IActionResult GetAllTerminos(Guid idioma)
+        public IActionResult GetAllTerminos()
         {
             try
             {
@@ -415,12 +399,28 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("idiomas")]
-        public IActionResult GetAllTerminos(Idioma idioma)
+        public IActionResult SaveIdioma(Idioma idioma)
         {
             try
             {
                 var status = _translate.SaveIdioma(idioma);
                 return Ok(status);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("idiomas")]
+        public IActionResult GetAllIdiomas()
+        {
+            try
+            {
+                var all = _translate.GetAllIdiomas();
+                return Ok(all);
             }
             catch (Exception ex)
             {

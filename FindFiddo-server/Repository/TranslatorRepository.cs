@@ -8,16 +8,11 @@ namespace FindFiddo_server.Repository
     public interface ITranslatorRepository
     {
         Idioma GetIdiomaDefault();
-
         List<Idioma> GetAllIdiomas();
-
-        IDictionary<string, Traduccion> GetAllTraducciones(Idioma idioma);
-
-        List<Termino> GetAllTerminos(Idioma idioma = null);
-
-        bool SaveOrUpdateIdioma(Idioma idioma);
-
-        bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma);
+        IDictionary<string, Traduccion> GetAllTraducciones(Guid idIdioma);
+        List<Termino> GetAllTerminos();
+        bool SaveIdioma(Idioma idioma);
+        bool SaveTraducciones(List<Traduccion> traducciones, Idioma idioma);
     }
     public class TranslatorRepository : ITranslatorRepository
     {
@@ -40,11 +35,11 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public List<Termino> GetAllTerminos(Idioma idioma = null)
+        public List<Termino> GetAllTerminos()
         {
             try
             {
-                return _ctx.GetAllTerminos(idioma);
+                return _ctx.GetAllTerminos();
             }
             catch (Exception)
             {
@@ -53,7 +48,7 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public IDictionary<string, Traduccion> GetAllTraducciones(Idioma idioma)
+        public IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma)
         {
             try
             {
@@ -80,11 +75,11 @@ namespace FindFiddo_server.Repository
             
         }
 
-        public bool SaveOrUpdateIdioma(Idioma idioma)
+        public bool SaveIdioma(Idioma idioma)
         {
             try
             {
-                return _ctx.SaveOrUpdateIdioma(idioma);
+                return _ctx.SaveIdioma(idioma);
             }
             catch (Exception)
             {
@@ -93,13 +88,13 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma)
+        public bool SaveTraducciones(List<Traduccion> traducciones, Idioma idioma)
         {
             try
             {
                 foreach (Traduccion t in traducciones)
                 {
-                    _ctx.SaveOrUpdateTraduccion(t, idioma);
+                    _ctx.SaveTraduccion(t, idioma);
                 }
 
                 return true;

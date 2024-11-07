@@ -6,12 +6,14 @@ namespace FindFiddo_server.DataAccess
 {
     public interface ITranslatorContext
     {
-        Idioma ObtenerIdiomaDefault();
-        List<Idioma> ObtenerIdiomas();
-        IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma);
-        List<Traduccion> GetAllTerminos(Idioma idioma = null);
-        bool InsertIdioma(Idioma idioma);
-        bool SaveTraduccion(List<Traduccion> traduc, Idioma idioma);
+        bool SaveIdioma(Idioma idioma);
+        List<Idioma> GetAllIdiomas();
+        List<Termino> GetAllTerminos();
+        bool SaveTraduccion(Traduccion traduc, Idioma idioma);
+        IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma);
+
+        Idioma GetIdiomaDefault();  
+ 
     }
     public class TranslatorContext: ITranslatorContext
     {
@@ -44,7 +46,7 @@ namespace FindFiddo_server.DataAccess
                          new Idioma()
                          {
                              Id = Guid.Parse(reader["ID"].ToString()),
-                             nombre = reader["NombreIdioma"].ToString(),
+                             descripcion = reader["NombreIdioma"].ToString(),
                              isDefault = Convert.ToBoolean(reader["defaultIdioma"])
 
                          };
@@ -73,7 +75,7 @@ namespace FindFiddo_server.DataAccess
                 List<Idioma> _idiomas = new List<Idioma>();
                 try
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetAllIdiomas", conn);
+                    SqlCommand cmd = new SqlCommand("lng_GetAllIdiomas", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     conn.Open();
 
@@ -81,15 +83,13 @@ namespace FindFiddo_server.DataAccess
 
                     while (reader.Read())
                     {
-
                         _idiomas.Add(
-                         new Idioma()
-                         {
-                             Id = Guid.Parse(reader["ID"].ToString()),
-                             nombre = reader["NombreIdioma"].ToString(),
-                             isDefault = Convert.ToBoolean(reader["defaultIdioma"])
+                            new Idioma(){
 
-                         });
+                                Id = Guid.Parse(reader["id_idioma"].ToString()),
+                                descripcion = reader["descripcion"].ToString()
+                            }
+                        );
                     }
                     return _idiomas;
                 }
@@ -107,7 +107,7 @@ namespace FindFiddo_server.DataAccess
             }
         }
 
-        public IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma)
+        public IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma)
         {
 
             using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
@@ -117,30 +117,30 @@ namespace FindFiddo_server.DataAccess
                 try
                 {
 
-                    SqlCommand cmd = new SqlCommand("sp_GetAllTraducciones", conn);
+                    SqlCommand cmd = new SqlCommand("lng_GetAllTraducciones", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@IdIdioma", idioma);
+                    cmd.Parameters.AddWithValue("@idIdioma", idioma);
                     conn.Open();
 
                     reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        var etiqueta = reader["ID"].ToString();
+                        var termino = reader["id_termino"].ToString();
 
-                        _traducciones.Add(etiqueta,
-                         new Traduccion()
-                         {
+                        _traducciones.Add(termino,
+                             new Traduccion(){
 
-                             texto = reader["traduccion"].ToString(),
+                                 texto = reader["traduccion"].ToString(),
 
-                             termino = new Termino()
-                             {
-                                 Id = Guid.Parse(etiqueta),
-                                 termino = reader["termino"].ToString()
+                                 termino = new Termino()
+                                 {
+                                     Id = Guid.Parse(termino),
+                                     termino = reader["descripcion"].ToString()
+                                 }
+
                              }
-
-                         });
+                        );
                     }
                     return _traducciones;
                 }
@@ -158,7 +158,7 @@ namespace FindFiddo_server.DataAccess
             }
         }
 
-        public List<Termino> GetAllTerminos(Idioma idioma = null)
+        public List<Termino> GetAllTerminos()
         {
             using (SqlConnection conn = new SqlConnection(_conn.ConnectionString) )
             {
@@ -167,14 +167,8 @@ namespace FindFiddo_server.DataAccess
 
                 try
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetAllTerminos", conn);
+                    SqlCommand cmd = new SqlCommand("lng_GetAllTerminos", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-
-                    if (idioma != null)
-                    { cmd.Parameters.AddWithValue("@id_Idioma", idioma.Id); }
-                    else
-                    { cmd.Parameters.AddWithValue("@id_Idioma", DBNull.Value); }
-
                     cmd.Connection = conn;
                     conn.Open();
 
@@ -184,9 +178,8 @@ namespace FindFiddo_server.DataAccess
                     {
                         _lista.Add(new Termino()
                         {
-
-                            Id = Guid.Parse(reader["ID"].ToString()),
-                            termino = reader["Termino"].ToString()
+                            Id = Guid.Parse(reader["id_termino"].ToString()),
+                            termino = reader["descripcion"].ToString()
 
                         });
                     }
@@ -206,7 +199,7 @@ namespace FindFiddo_server.DataAccess
             }
         }
 
-        public bool SaveOrUpdateIdioma(Idioma idioma)
+        public bool SaveIdioma(Idioma idioma)
         {
             using (SqlConnection conn = _conn)
             {
@@ -240,7 +233,7 @@ namespace FindFiddo_server.DataAccess
 
         }
 
-        public bool SaveOrUpdateTraduccion(Traduccion traduc, Idioma idioma)
+        public bool SaveTraduccion(Traduccion traduc, Idioma idioma)
         {
             using (SqlConnection conn = _conn)
             {
@@ -248,7 +241,7 @@ namespace FindFiddo_server.DataAccess
 
                 try
                 {
-                    SqlCommand cmd = new SqlCommand("sp_InsertTraduccion", conn);
+                    SqlCommand cmd = new SqlCommand("lng_SaveTraduccion", conn);
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("@IdIdioma", idioma.Id);

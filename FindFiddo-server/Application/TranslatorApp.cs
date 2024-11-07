@@ -6,25 +6,25 @@ namespace FindFiddo_server.Application
     public interface ITranslatorApp
     {
         Idioma ObtenerIdiomaDefault();
-        List<Idioma> ObtenerIdiomas();
-        IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma);
-        List<Traduccion> GetAllTerminos(Idioma idioma = null);
+        List<Idioma> GetAllIdiomas();
+        IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma);
+        List<Termino> GetAllTerminos();
         bool SaveIdioma(Idioma idioma);
-        bool SaveTraduccion(List<Traduccion> lista, Idioma idioma);
+        bool SaveTraducciones(List<Traduccion> lista, Idioma idioma);
     }
-    public class TranslatorApp: ITranslatorApp
+    public class TranslatorApp : ITranslatorApp
     {
         ITranslatorRepository _repo;
-        public TranslatorApp(ITranslatorRepository repo) 
+        public TranslatorApp(ITranslatorRepository repo)
         {
-            _repo = repo;   
+            _repo = repo;
         }
 
         public bool SaveIdioma(Idioma idioma)
         {
             try
             {
-                return _repo.GetAllIdiomas();
+                return _repo.SaveIdioma(idioma);
             }
             catch (Exception)
             {
@@ -33,11 +33,11 @@ namespace FindFiddo_server.Application
             }
         }
 
-        public List<Termino> GetAllTerminos(Idioma idioma = null)
+        public List<Termino> GetAllTerminos()
         {
             try
             {
-                return _repo.GetAllTerminos(idioma);
+                return _repo.GetAllTerminos();
             }
             catch (Exception)
             {
@@ -46,67 +46,37 @@ namespace FindFiddo_server.Application
             }
         }
 
-        public IDictionary<string, Traduccion> ObtenerTraducciones(Guid idioma)
+        public IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma)
         {
             try
             {
-                IDictionary<string, Traduccion> traducciones = _repo.ObtenerTraducciones(idioma);
-                
-                return traducciones;
+                return _repo.GetAllTraducciones(idioma);
             }
             catch (Exception)
-            {
+            {  throw;}
 
         }
 
-        public bool SaveTraduccion(List<Traduccion> lista, Idioma idioma)
+        public bool SaveTraducciones(List<Traduccion> lista, Idioma idioma)
         {
             try
             {
-                return _repo.SaveTraduccion(lista, idioma);
+                return _repo.SaveTraducciones(lista, idioma);
             }
             catch (Exception e)
             {
                 throw;
             }
-
         }
 
-
-        public List<Traduccion> GetAllTerminos(Idioma idioma = null)
+        public Idioma ObtenerIdiomaDefault()
         {
-            try
-            {
-                return _repo.GetAllTerminos(idioma);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            throw new NotImplementedException();
         }
 
-        public bool SaveOrUpdateTraducciones(List<Traduccion> traducciones, Idioma idioma)
+        public List<Idioma> GetAllIdiomas()
         {
-            try
-            {
-                List<TraduccionDTO> traduccionDTOs = new List<TraduccionDTO>();
-                foreach (var item in _repo.GetAllTerminos(idioma))
-                {
-                    traduccionDTOs.Add(new TraduccionDTO
-                    {
-                        id = item.termino.id,
-                        termino = item.termino.termino,
-                        traduccion = item.texto
-                    }
-                    );
-                }
-                return traduccionDTOs;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            
+            return _repo.GetAllIdiomas();
         }
 
     }
