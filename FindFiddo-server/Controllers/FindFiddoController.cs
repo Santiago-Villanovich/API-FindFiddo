@@ -17,19 +17,22 @@ namespace FindFiddo_Server.Controllers
         private IDVService _dv;
         private IUsuarioApp _user;
         private ITranslatorApp _translate;
+        private IPublicacionApp _publicacion;
 
         public FindFiddoController
         (
             ILogger<FindFiddoController> logger, 
             IDVService dvService,
             IUsuarioApp usuarioApp,
-            ITranslatorApp translate
+            ITranslatorApp translate,
+            IPublicacionApp publicacion
         )
         {
             _logger = logger;
             _user = usuarioApp;
             _dv = dvService;
             _translate = translate;
+            _publicacion = publicacion;
         }
 
        
@@ -77,6 +80,8 @@ namespace FindFiddo_Server.Controllers
                     };
 
                 }
+                if (user.idioma_preferido == null)
+                    user.idioma_preferido = Guid.Parse("0DAC9C9C-B1C3-4FF5-9B85-595427E6210C"); //espaniol default
 
                 LogedUser UsrLoged = _user.SignUP(user);
 
@@ -289,23 +294,38 @@ namespace FindFiddo_Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("organizacion/get_all")]
-        public IActionResult GetAllOrganizaciones(string? from, string? to, string? action, int pag)
+        [HttpPost]
+        [Route("organizaciones")]
+        public IActionResult SaveOrganizaciones(Organizacion org)
         {
             try
             {
-                DateTime desde, hasta;
+                if (org == null)
+                    return BadRequest("El objeto no puede ser nulo");
 
-                if (DateTime.TryParse(from, out desde) && DateTime.TryParse(to, out hasta))
-                {
-                    var all = _user.getOrganizaciones(desde, hasta, action, pag);
-                    return Ok(all);
-                }
-                else
-                {
-                    return BadRequest("Formato de las fechas incorrecto");
-                }
+                var o = _user.SaveOrganizacion(org);
+                return Ok(o);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("organizaciones")]
+        public IActionResult GetAllOrganizaciones(string? idUser)
+        {
+            try
+            {
+                Guid id = Guid.Empty;
+                
+                if(!String.IsNullOrEmpty(idUser))
+                    id = Guid.Parse(idUser);
+
+                var all = _user.GetAllOrganizaciones(id);
+                return Ok(all);
 
             }
             catch (Exception ex)
@@ -316,7 +336,7 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("organizacion/{id}")]
+        [Route("organizaciones/{id}")]
         public IActionResult GetOrganizacionById(Guid id)
         {
             try
@@ -332,13 +352,13 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("organizacion/asignarUser")]
-        public IActionResult Asignar_user_organizacion(Guid Id_user,Guid Id_org)
+        [Route("organizaciones/{id}/asignar/{user}")]
+        public IActionResult Asignar_user_organizacion(Guid user,Guid id)
         {
             try
             {
-                _user.Asignar_Usuario_Organizacion(Id_user, Id_org);
-                return Ok("Se asigno el ususario a la organizacion :"+Id_org);
+                _user.Asignar_Usuario_Organizacion(user, id);
+                return Ok("Se asigno el ususario a la organizacion :"+id);
 
             }
             catch (Exception ex)
@@ -349,13 +369,13 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("organizacion/desasignarUser")]
-        public IActionResult Desasignar_user_organizacion(Guid Id_user,Guid Id_org)
+        [Route("organizaciones/{id}/desasignar/{user}")]
+        public IActionResult Desasignar_user_organizacion(Guid id,Guid user)
         {
             try
             {
-                _user.Desasignar_Usuario_Organizacion(Id_user, Id_org);
-                return Ok("Se desasigno el ususario" + Id_user+" a la organizacion :" + Id_org);
+                _user.Desasignar_Usuario_Organizacion(user, id);
+                return Ok("Se desasigno el ususario" + user+" a la organizacion :" + id);
 
             }
             catch (Exception ex)
@@ -367,11 +387,30 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("idiomas/{idioma}/traducciones")]
-        public IActionResult GetIdiomaByUser(Guid idioma)
+        public IActionResult GetIdiomaTraducciones(Guid idioma)
         {
             try
             {
                 var all = _translate.GetAllTraducciones(idioma);
+                return Ok(all);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("idiomas/{idioma}/traducciones")]
+        public IActionResult SaveIdiomaTraducciones(Guid idioma, [FromBody] List<Traduccion> traducciones)
+        {
+            try
+            {
+                if (!(traducciones.Count() > 0))
+                    return BadRequest("La lista no puede estar vacia");
+                
+                var all = _translate.SaveTraducciones(traducciones,new Idioma() { Id = idioma});
                 return Ok(all);
             }
             catch (Exception ex)
@@ -456,7 +495,7 @@ namespace FindFiddo_Server.Controllers
             {
 
                 Organizacion org = XMLservice.deserializarXML(xml);
-                _user.InsertOrganizacion(org);
+                _user.SaveOrganizacion(org);
                 return Ok();
 
             }
@@ -468,13 +507,15 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("publicacion/save")]
-        public IActionResult save_publicacion([FromBody] Publicacion publi)
+        [Route("publicaciones")]
+        public IActionResult SavePublicacion([FromBody] Publicacion publi)
         {
             try
             {
-
-                _user.InsertPublicacion(publi);
+                if (publi == null)
+                    return BadRequest("La publicacion no puede ser nula");
+            
+                _publicacion.SavePublicacion(publi);
                 return Ok("Publicacion guardada maquina");
 
             }
@@ -486,14 +527,13 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("publicacion")]
-        public IActionResult get_publicaciones(DateTime from, DateTime to, string tipo, int pag)
+        [Route("publicaciones/user/{idUser}")]
+        public IActionResult getPublicacionesByUser(Guid idUser)
         {
             try
             {
-
-               IList<Publicacion> publicaciones = _user.GetPublicaciones(from, to, tipo, pag);  
-                return Ok(publicaciones);
+                var all = _publicacion.GetPublicacionesByUser(idUser);
+                return Ok(all);
 
             }
             catch (Exception ex)
