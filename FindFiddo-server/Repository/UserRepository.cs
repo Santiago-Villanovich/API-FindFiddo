@@ -13,16 +13,14 @@ namespace FindFiddo.Repository
         void InsertUserLog(Guid id, string accion);
         List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
 
-        void InsertOrganizacion(Organizacion organizacion);
+        Organizacion SaveOrganizacion(Organizacion organizacion);
         void DeleteOrganizacion(Guid id_organizacion);
-        IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag);
+        IList<Organizacion> GetAllOrganizaciones(Guid idUser);
         Organizacion getOrganizacionByID(Guid id);
 
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
 
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
-        void InsertPublicacion(Publicacion publicacion);
-        IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
     
     }
     public class UserRepository : IUserRepository
@@ -83,9 +81,9 @@ namespace FindFiddo.Repository
             _ctx.InsertUserLog(id, accion);
         }
 
-        public void InsertOrganizacion(Organizacion organizacion)
+        public Organizacion SaveOrganizacion(Organizacion organizacion)
         {
-            _ctx.InsertOrganizacion(organizacion);
+            return _ctx.SaveOrganizacion(organizacion);
         }
 
         public void DeleteOrganizacion(Guid id_organizacion)
@@ -93,9 +91,9 @@ namespace FindFiddo.Repository
              _ctx.DeleteOrganizacion(id_organizacion);
         }
 
-        public IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag)
+        public IList<Organizacion> GetAllOrganizaciones(Guid idUser)
         {
-           return _ctx.getOrganizaciones(from, to, accion, pag);
+           return _ctx.GetAllOrganizaciones( idUser);
         }
 
         public Organizacion getOrganizacionByID(Guid id)
@@ -113,14 +111,5 @@ namespace FindFiddo.Repository
             _ctx.Desasignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
         }
 
-        public void InsertPublicacion(Publicacion publicacion)
-        {
-            _ctx.InsertPublicacion(publicacion);
-        }
-
-        public IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag)
-        {
-            return _ctx.GetPublicaciones(from,to,tipo,pag);
-        }
     }
 }

@@ -10,7 +10,7 @@ namespace FindFiddo_server.DataAccess
         List<Idioma> GetAllIdiomas();
         List<Termino> GetAllTerminos();
         bool SaveTraduccion(Traduccion traduc, Idioma idioma);
-        IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma);
+        IDictionary<string, TraduccionDTO> GetAllTraducciones(Guid idioma);
 
         Idioma GetIdiomaDefault();  
  
@@ -107,13 +107,13 @@ namespace FindFiddo_server.DataAccess
             }
         }
 
-        public IDictionary<string, Traduccion> GetAllTraducciones(Guid idioma)
+        public IDictionary<string, TraduccionDTO> GetAllTraducciones(Guid idioma)
         {
 
             using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
             {
                 IDataReader reader = null;
-                IDictionary<string, Traduccion> _traducciones = new Dictionary<string, Traduccion>();
+                IDictionary<string, TraduccionDTO> _traducciones = new Dictionary<string, TraduccionDTO>();
                 try
                 {
 
@@ -129,16 +129,11 @@ namespace FindFiddo_server.DataAccess
                         var termino = reader["id_termino"].ToString();
 
                         _traducciones.Add(termino,
-                             new Traduccion(){
+                             new TraduccionDTO(){
 
-                                 texto = reader["traduccion"].ToString(),
-
-                                 termino = new Termino()
-                                 {
-                                     Id = Guid.Parse(termino),
-                                     termino = reader["descripcion"].ToString()
-                                 }
-
+                                 id = Guid.Parse(termino),
+                                 termino = reader["descripcion"].ToString(),
+                                 traduccion = reader.GetString(reader.GetOrdinal("traduccion"))
                              }
                         );
                     }

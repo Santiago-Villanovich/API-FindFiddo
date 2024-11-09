@@ -14,18 +14,14 @@ namespace FindFiddo.Application
         void InsertUserLog(Guid id, string accion);
         List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
 
-        void InsertOrganizacion(Organizacion organizacion);
+        Organizacion SaveOrganizacion(Organizacion organizacion);
         void DeleteOrganizacion(Guid id_organizacion);
-        IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag);
+        IList<Organizacion> GetAllOrganizaciones(Guid idUser);
         Organizacion getOrganizacionByID(Guid id);
 
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
-
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
 
-        void InsertPublicacion(Publicacion publicacion);
-
-        IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -90,9 +86,10 @@ namespace FindFiddo.Application
             return _repo.signUP(user);
         }
 
-        void InsertOrganizacion(Organizacion organizacion)
+        public Organizacion SaveOrganizacion(Organizacion organizacion)
         {
-            _repo.InsertOrganizacion(organizacion);
+            organizacion.DV = DigitoVerificador.CalcularDV(organizacion);
+            return _repo.SaveOrganizacion(organizacion);
         }
 
         public void DeleteOrganizacion(Guid id_organizacion)
@@ -100,19 +97,14 @@ namespace FindFiddo.Application
             _repo.DeleteOrganizacion(id_organizacion);
         }
 
-        public IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag)
+        public IList<Organizacion> GetAllOrganizaciones(Guid idUser)
         {
-            return _repo.getOrganizaciones(from,to, accion, pag);
+            return _repo.GetAllOrganizaciones(idUser);
         }
 
         public Organizacion getOrganizacionByID(Guid id)
         {
             return _repo.getOrganizacionByID(id);
-        }
-
-        void IUsuarioApp.InsertOrganizacion(Organizacion organizacion)
-        {
-            _repo.InsertOrganizacion(organizacion);
         }
 
         public void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
@@ -123,16 +115,6 @@ namespace FindFiddo.Application
         public void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
         {
             _repo.Desasignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
-        }
-
-        public void InsertPublicacion(Publicacion publicacion)
-        {
-            _repo.InsertPublicacion(publicacion);
-        }
-
-        public IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag)
-        {
-            return _repo.GetPublicaciones(from, to, tipo, pag);
         }
     }
 }

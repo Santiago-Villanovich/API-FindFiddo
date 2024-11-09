@@ -27,7 +27,7 @@ namespace FindFiddo.Entities
         [VerificableProperty]
         public byte[]? salt { get; set; }
         public string? DV { get; set; }
-
+        public Guid? idioma_preferido { get; set; }
         public User() { }
     }
 

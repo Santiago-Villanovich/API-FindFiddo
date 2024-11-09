@@ -12,26 +12,24 @@ namespace FindFiddo.DataAccess
 {
     public interface IUserContext : ICrud<User>
     {
+        #region(user)
         User GetUserByEmail(string email);
         List<Rol> GetUserRols(Guid idUsuario);
         LogedUser signUP(User user);
         void InsertUserLog(Guid idUser, string accion);
         List<UserLog> GetLog(DateTime from, DateTime to, string accion, int pag);
         void InsertUserRol(Guid idUser, List<Rol> roles);
+        #endregion
 
-        void InsertOrganizacion(Organizacion organizacion);
+        #region(organizacion)
+        Organizacion SaveOrganizacion(Organizacion organizacion);
         void DeleteOrganizacion(Guid id_organizacion);
-        IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag);
+        IList<Organizacion> GetAllOrganizaciones(Guid idUser);
         Organizacion getOrganizacionByID(Guid id);
-
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
-
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
+        #endregion
 
-        void InsertPublicacion(Publicacion publicacion);
-
-        IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
-    
     }
     public class UserContext : IUserContext
     {
@@ -243,6 +241,7 @@ namespace FindFiddo.DataAccess
                 cmd.Parameters.AddWithValue("@dv", user.DV);
                 cmd.Parameters.AddWithValue("@salt", user.salt);
                 cmd.Parameters.AddWithValue("@fecha_creacion", DateTime.Now);
+                cmd.Parameters.AddWithValue("@idIdioma", user.idioma_preferido);
 
 
                 _conn.Open();
@@ -366,28 +365,28 @@ namespace FindFiddo.DataAccess
             finally { _conn.Close(); }
         }
 
-        public void InsertOrganizacion(Organizacion organizacion)
+        public Organizacion SaveOrganizacion(Organizacion organizacion)
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("insert_organizacion", _conn);
+                using SqlCommand cmd = new SqlCommand("org_SaveOrganizacion", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-
-                _conn.Open();
                 
-               
+                if(organizacion.Id == Guid.Empty)
+                    organizacion.Id = Guid.NewGuid();
+              
                 cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@idOrganizacion", organizacion.Id);
+                cmd.Parameters.AddWithValue("@id", organizacion.Id);
                 cmd.Parameters.AddWithValue("@direccion", organizacion.direccion);
-                cmd.Parameters.AddWithValue("@fecha_creacion", organizacion.fechaCreacion);
-                cmd.Parameters.AddWithValue("@razon_social", organizacion.razon_social);
-                cmd.Parameters.AddWithValue("@codigo_postal", organizacion.codigo_postal);
-                cmd.Parameters.AddWithValue("@digito_Verificador", organizacion.digito_verificador);
+                cmd.Parameters.AddWithValue("@razon", organizacion.razon_social);
+                cmd.Parameters.AddWithValue("@codPostal", organizacion.codigo_postal);
+                cmd.Parameters.AddWithValue("@dv", organizacion.DV);
                 cmd.Parameters.AddWithValue("@nombre", organizacion.nombre);
 
+                _conn.Open();
                 cmd.ExecuteNonQuery();
                
+                return organizacion;
             }
             catch (Exception ex)
             {
@@ -401,10 +400,10 @@ namespace FindFiddo.DataAccess
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("usr_DeleteOrganizacion", _conn);
+                using SqlCommand cmd = new SqlCommand("org_DeleteOrganizacion", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@idOrganizacion", id_organizacion);
+                cmd.Parameters.AddWithValue("@id", id_organizacion);
 
                 _conn.Open();
                 cmd.ExecuteNonQuery();
@@ -420,20 +419,17 @@ namespace FindFiddo.DataAccess
             }
         }
 
-        public IList<Organizacion> getOrganizaciones(DateTime from, DateTime to, string accion, int pag)
+        public IList<Organizacion> GetAllOrganizaciones(Guid idUser)
         {
             List<Organizacion> list = new List<Organizacion>();
             try
             {
                 Organizacion org = null;
 
-                using SqlCommand cmd = new SqlCommand("get_all_organizaciones", _conn);
+                using SqlCommand cmd = new SqlCommand("org_GetAllOrganizaciones", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@from", DBNull.Value);
-                cmd.Parameters.AddWithValue("@to", DBNull.Value);
-                cmd.Parameters.AddWithValue("@action", !string.IsNullOrEmpty(accion) ? accion : DBNull.Value);
-                cmd.Parameters.AddWithValue("@page", pag);
+                cmd.Parameters.AddWithValue("@idUser", !(idUser == Guid.Empty) ? idUser : DBNull.Value);
 
 
                 _conn.Open();
@@ -443,12 +439,12 @@ namespace FindFiddo.DataAccess
                 {
                     org = new Organizacion()
                     {
-                        Id = reader.GetGuid("id_org"),
+                        Id = reader.GetGuid("id_organizacion"),
                         nombre = reader.GetString("nombre"),
                         razon_social=reader.GetString("razon_social"),
                         direccion=reader.GetString("direccion"),
                         codigo_postal=reader.GetInt32("codigo_postal"),
-                        digito_verificador=reader.GetString("digito_verificador"),
+                        DV = reader.GetString("digito_verificador"),
                         fechaCreacion = Convert.ToDateTime(reader["fecha_creacion"])
                        
                     };
@@ -490,7 +486,7 @@ namespace FindFiddo.DataAccess
                         razon_social = reader.GetString("razon_social"),
                         direccion = reader.GetString("direccion"),
                         codigo_postal = reader.GetInt32("codigo_postal"),
-                        digito_verificador = reader.GetString("digito_verificador"),
+                        DV = reader.GetString("digito_verificador"),
                         fechaCreacion = Convert.ToDateTime(reader["fecha_creacion"])
 
                     };
@@ -511,7 +507,7 @@ namespace FindFiddo.DataAccess
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("Asignar_usuario_organizacion", _conn);
+                using SqlCommand cmd = new SqlCommand("org_Add_organizacion_user", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@idUser", Id_ususario);
@@ -535,7 +531,7 @@ namespace FindFiddo.DataAccess
         {
             try
             {
-                using SqlCommand cmd = new SqlCommand("desasignar_usuario_organizacion", _conn);
+                using SqlCommand cmd = new SqlCommand("org_Delete_organizacion_user", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@idUser", Id_ususario);
@@ -553,77 +549,6 @@ namespace FindFiddo.DataAccess
             {
                 _conn.Close();
             }
-        }
-
-        public void InsertPublicacion(Publicacion publicacion)
-        {
-            try
-            {
-                using SqlCommand cmd = new SqlCommand("insert_organizacion", _conn);
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-
-                _conn.Open();
-
-
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@id_publicacion", publicacion.Id);
-                cmd.Parameters.AddWithValue("@ubicacion", publicacion.ubicacion);
-                cmd.Parameters.AddWithValue("@fecha_creacion", publicacion.fechaCreacion);
-                cmd.Parameters.AddWithValue("@insert_time", DateTime.Now);
-                cmd.Parameters.AddWithValue("@tipo", publicacion.tipo);
-                cmd.Parameters.AddWithValue("@descripcion", publicacion.descripcion);
-                
-
-                cmd.ExecuteNonQuery();
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            { _conn.Close(); }
-        }
-
-        public IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag)
-        {
-            try
-            {
-                IList<Publicacion> Publicaciones = new List<Publicacion>();
-
-                using SqlCommand cmd = new SqlCommand("usr_Publicacion", _conn);
-
-                cmd.Parameters.AddWithValue("@from", from);
-                cmd.Parameters.AddWithValue("@to", to);
-                cmd.Parameters.AddWithValue("@tipo", tipo);
-                cmd.Parameters.AddWithValue("@pag", pag);
-
-
-                _conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    
-                    Publicacion publi = new Publicacion();
-                    publi.Id = reader.GetGuid(reader.GetOrdinal("id_publicacion"));
-                    publi.descripcion = (string)reader["descripcion"];
-                    publi.tipo= (string)reader["tipo"];
-                    publi.historia = (string)reader["historia"];
-                    publi.fechaCreacion = reader.GetDateTime(reader.GetOrdinal("fecha_nacimiento"));
-                    publi.Fecha_Alta = reader.GetDateTime(reader.GetOrdinal("fecha_alta"));
-                    publi.ubicacion = reader.GetString("ubicacion");
-                    
-                }
-
-                return Publicaciones;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally { _conn.Close(); }
         }
     }
 }
