@@ -26,6 +26,10 @@ builder.Services.AddScoped<IDVService, DVApp>();
 builder.Services.AddScoped<IDVRepository, DVRepository>();
 builder.Services.AddScoped<IDVContext, DVContext>();
 
+builder.Services.AddScoped<IPublicacionApp, PublicacionApp>();
+builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
+builder.Services.AddScoped<IPublicacionContext, PublicacionContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
