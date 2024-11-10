@@ -1,7 +1,10 @@
 ﻿using FindFiddo.Entities;
 using FindFiddo_server.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 using System.Data.SqlClient;
+using System.Reflection.PortableExecutable;
 
 namespace FindFiddo_server.DataAccess
 {
@@ -11,12 +14,9 @@ namespace FindFiddo_server.DataAccess
         IList<Publicacion> GetPublicacionesByUser(Guid idUser);
         IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
 
-       
-
-        void SaveOpcion(Opcion opcion);
-
-        void SaveCategory(Categoria categoria);
-        IList<Categoria> GetCategories(Guid catagory);
+        void DeleteCategoria(Guid idCategoria);
+        Categoria SaveCategoria(Categoria categoria);
+        IList<Categoria> GetAllcategorias(string nombre);
     }
     public class PublicacionContext:IPublicacionContext
     {
@@ -150,22 +150,15 @@ namespace FindFiddo_server.DataAccess
             
         }
 
-        public void SaveOpcion(Opcion opcion)
+        public void DeleteCategoria(Guid idCategoria)
         {
           
             try
             {
-                using SqlCommand cmd = new SqlCommand("pub_SaveOpcion", _conn);//Crear Script
+                using SqlCommand cmd = new SqlCommand("cat_DeleteCategoria", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
-                if (opcion.Id == Guid.Empty)
-                {
-                    opcion.Id = Guid.NewGuid();
-                }
-
-                cmd.Parameters.AddWithValue("@id", opcion.Id);
-                cmd.Parameters.AddWithValue("@nombre", opcion.nombre);
-               
+                cmd.Parameters.AddWithValue("@id", idCategoria);
 
                 _conn.Open();
                 cmd.ExecuteNonQuery();
@@ -179,69 +172,43 @@ namespace FindFiddo_server.DataAccess
             { _conn.Close(); }
         }
 
-        public void SaveOpcionForCategory(Opcion opcion,Guid category)
+        public Categoria SaveCategoria(Categoria categoria)
         {
-
+            
             try
             {
-                using SqlCommand cmd = new SqlCommand("pub_SaveOpcion", _conn);//Crear Script
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-                if (opcion.Id == Guid.Empty)
-                {
-                    opcion.Id = Guid.NewGuid();
-                }
-
-                cmd.Parameters.AddWithValue("@id", opcion.Id);
-                cmd.Parameters.AddWithValue("@nombre", opcion.nombre);
-                cmd.Parameters.AddWithValue("@categoria_id", category);
-
-
-                _conn.Open();
-                cmd.ExecuteNonQuery();
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            { _conn.Close(); }
-        }
-        public void SaveCategory(Categoria categoria)
-        {
-            bool isNew = false;
-            try
-            {
-                using SqlCommand cmd = new SqlCommand("pub_SaveCategoria", _conn);//crear Script
+                using SqlCommand cmd = new SqlCommand("cat_SaveCategoria", _conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 if (categoria.Id == Guid.Empty)
                 {
                     categoria.Id = Guid.NewGuid();
-                    isNew = true;
                 }
 
-                cmd.Parameters.AddWithValue("@categoria_id", categoria.Id);
-                cmd.Parameters.AddWithValue("@categoria_nombre", categoria.nombre);
-                if (categoria.opciones.Count > 0) 
-                {
-                    foreach (Opcion op in categoria.opciones)
-                    {
-                        if (op.Id == Guid.Empty)
-                        {
-                            op.Id = Guid.NewGuid();
-
-                        }
-                        SaveOpcionForCategory(op, categoria.Id);
-                    }
-                }
-                
-               
+                cmd.Parameters.AddWithValue("@id", categoria.Id);
+                cmd.Parameters.AddWithValue("@nombre", categoria.nombre);
 
                 _conn.Open();
                 cmd.ExecuteNonQuery();
 
+                if (categoria.opciones != null && categoria.opciones.Count > 0) 
+                {
+                    cmd.CommandText = "cat_SaveCategoriaOpcion";
+                    foreach (Opcion op in categoria.opciones)
+                    {
+                        cmd.Parameters.Clear();
+                        if(op.Id == Guid.Empty)
+                            op.Id = Guid.NewGuid();
+
+                        cmd.Parameters.AddWithValue("@id", op.Id);
+                        cmd.Parameters.AddWithValue("@nombre", op.nombre);
+                        cmd.Parameters.AddWithValue("@idCategoria", categoria.Id);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return categoria;
 
             }
             catch (Exception ex)
@@ -252,47 +219,53 @@ namespace FindFiddo_server.DataAccess
             { _conn.Close(); }
         }
 
-        public IList<Categoria> GetCategories(Guid catagory)
+        public IList<Categoria> GetAllcategorias(string nombre)
         {
             try
             {
                 IList<Categoria> categorias = new List<Categoria>();
 
-                using (SqlCommand cmd = new SqlCommand("pub_GetAllCategorias", _conn))
+                using (SqlCommand cmd = new SqlCommand("cat_GetAllCategorias", _conn))
                 {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@nombre", !string.IsNullOrEmpty(nombre) ? nombre : (object)DBNull.Value);
+
                     _conn.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
                     {
-                        Categoria currentCategoria = null;
+                        Guid id = reader.GetGuid(reader.GetOrdinal("categoria_id"));
+                        var cat = categorias.FirstOrDefault(c => c.Id.Equals(id));
 
-                        while (reader.Read())
+                        Opcion op = null;
+                        if (!reader.IsDBNull(reader.GetOrdinal("opcion_id")))
                         {
-                            Guid id = reader.GetGuid(reader.GetOrdinal("id_publicacion"));
-                            currentCategoria = categorias.FirstOrDefault(c => c.Id.Equals(id));
+                            op = new Opcion(
+                            reader.GetGuid(reader.GetOrdinal("opcion_id")),
+                            reader.GetString(reader.GetOrdinal("opcion_nombre"))
+                            );
 
-                            if (currentCategoria == null)
-                            {
+                        }
 
-                                currentCategoria = new Categoria
-                                {
-                                    Id = id,
-                                    nombre = reader.GetString(reader.GetOrdinal("categoria_nombre")),
-                                    opciones = new List<Opcion>() 
-                                };
+                        if (cat == null)
+                        {
+                            cat = new Categoria();
+                            cat.Id = id;
+                            cat.nombre = reader.GetString(reader.GetOrdinal("categoria_nombre"));
+                            cat.opciones = new List<Opcion>();
 
-                                categorias.Add(currentCategoria); 
-                            }
+                            if(op != null)
+                                cat.opciones.Add(op);
 
-                            if (!reader.IsDBNull(reader.GetOrdinal("opcion_id")))
-                            {
-                                Opcion op = new Opcion
-                                (
-                                    reader.GetGuid(reader.GetOrdinal("opcion_id")),
-                                    reader.GetString(reader.GetOrdinal("opcion_nombre"))
-                                );
+                            categorias.Add(cat);
 
-                                currentCategoria.opciones.Add(op);
-                            }
+                        }
+                        else
+                        {
+                            if (op != null)
+                                cat.opciones.Add(op);
                         }
                     }
                 }

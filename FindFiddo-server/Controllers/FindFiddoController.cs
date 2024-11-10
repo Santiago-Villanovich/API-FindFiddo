@@ -565,29 +565,6 @@ namespace FindFiddo_Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("preferencias/save")]
-        public IActionResult SavePreferencias([FromBody] Opcion op)
-        {
-            try
-            {
-                if (op == null)
-                    return BadRequest("La opcion no puede ser nula");
-                
-
-                _publicacion.SaveOpcion(op);
-                return Ok("Opcion guardada maquina");
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        //hacer context
-
-        [AllowAnonymous]
         [HttpGet]
         [Route("user/match")]
         public IActionResult getMatchsForUser(Guid idUser)
@@ -610,12 +587,12 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("categorias")]
-        public IActionResult GetCategories(Guid categoria)
+        public IActionResult GetAllCategories(string? nombre)
         {
             try
             {
 
-                var all = _publicacion.GetCategories(categoria);
+                var all = _publicacion.GetAllcategorias(nombre);
                 return Ok(all);
 
             }
@@ -627,8 +604,9 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("categorias/save")]
-        public IActionResult SaveCategory([FromBody] Categoria categoria)
+        [ApiExplorerSettings(GroupName = "Categorias")]
+        [Route("categorias")]
+        public IActionResult SaveCategoria([FromBody] Categoria categoria)
         {
             try
             {
@@ -636,8 +614,29 @@ namespace FindFiddo_Server.Controllers
                     return BadRequest("La categoria no puede ser nula");
 
 
-                _publicacion.SaveCategory(categoria);
-                return Ok("Opcion guardada maquina");
+                var cat = _publicacion.SaveCategoria(categoria);
+                return Ok(cat);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpDelete]
+        [Route("categorias/{idCategoria}")]
+        public IActionResult DeleteCategoria(Guid idCategoria)
+        {
+            try
+            {
+                if (idCategoria == Guid.Empty)
+                    return BadRequest("La categoria no puede ser nula");
+
+
+                _publicacion.DeleteCategoria(idCategoria);
+                return Ok();
 
             }
             catch (Exception ex)

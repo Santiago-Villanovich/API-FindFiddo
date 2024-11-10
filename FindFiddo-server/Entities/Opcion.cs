@@ -5,6 +5,7 @@ namespace FindFiddo_server.Entities
     public class Opcion:Entity
     {
         public string nombre { get; set; }
+        public Opcion() { }
         public Opcion(string nombre) {
             this.nombre = nombre;
         }

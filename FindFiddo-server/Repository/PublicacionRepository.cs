@@ -9,11 +9,9 @@ namespace FindFiddo_server.Repository
         IList<Publicacion> GetPublicacionesByUser(Guid idUser);
         IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
 
-
-        void SaveOpcion(Opcion opcion);
-
-        void SaveCategory(Categoria categoria);
-        IList<Categoria> GetCategories(Guid catagory);
+        void DeleteCategoria(Guid idCategoria);
+        Categoria SaveCategoria(Categoria categoria);
+        IList<Categoria> GetAllcategorias(string nombre);
     }
     public class PublicacionRepository:IPublicacionRepository
     {
@@ -37,19 +35,35 @@ namespace FindFiddo_server.Repository
             return _ctx.GetPublicacionesByUser(idUser);
         }
 
-        public void SaveOpcion(Opcion opcion)
+        public void DeleteCategoria(Guid idCategoria)
         {
-            _ctx.SaveOpcion(opcion);
+            try
+            {
+                _ctx.DeleteCategoria(idCategoria);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public void SaveCategory(Categoria categoria)
+        public Categoria SaveCategoria(Categoria categoria)
         {
-            _ctx.SaveCategory(categoria);
+            try
+            {
+                return _ctx.SaveCategoria(categoria);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public IList<Categoria> GetCategories(Guid catagory)
+        public IList<Categoria> GetAllcategorias(string nombre)
         {
-            return _ctx.GetCategories(catagory);  
+            return _ctx.GetAllcategorias(nombre);
         }
     }
 }
