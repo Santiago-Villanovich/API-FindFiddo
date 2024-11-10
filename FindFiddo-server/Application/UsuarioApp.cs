@@ -22,6 +22,10 @@ namespace FindFiddo.Application
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
 
+        void SavePreferenciaForUser(Guid idUser, List<Opcion> opciones);
+
+        IList<Publicacion> GetMatchsForUser(Guid IdUser);
+
     }
     public class UsuarioApp : IUsuarioApp
     {
@@ -115,6 +119,16 @@ namespace FindFiddo.Application
         public void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
         {
             _repo.Desasignar_Usuario_Organizacion(Id_ususario, Id_organizacion);
+        }
+
+        public void SavePreferenciaForUser(Guid idUser, List<Opcion> opciones)
+        {
+            _repo.SavePreferenciaForUser(idUser, opciones);
+        }
+
+        public IList<Publicacion> GetMatchsForUser(Guid IdUser)
+        {
+            return _repo.GetMatchsForUser(IdUser);
         }
     }
 }

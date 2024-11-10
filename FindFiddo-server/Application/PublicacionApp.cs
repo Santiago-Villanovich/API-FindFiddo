@@ -1,5 +1,6 @@
 ﻿using FindFiddo_server.Entities;
 using FindFiddo_server.Repository;
+using System.Reflection.Metadata.Ecma335;
 
 namespace FindFiddo_server.Application
 {
@@ -8,6 +9,11 @@ namespace FindFiddo_server.Application
         void SavePublicacion(Publicacion publicacion);
         IList<Publicacion> GetPublicacionesByUser(Guid idUser);
         IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
+
+        void SaveOpcion(Opcion opcion);
+
+        void SaveCategory(Categoria categoria);
+        IList<Categoria> GetCategories(Guid catagory);
     }
     public class PublicacionApp:IPublicacionApp
     {
@@ -30,6 +36,21 @@ namespace FindFiddo_server.Application
         public IList<Publicacion> GetPublicacionesByUser(Guid idUser)
         {
             return _repo.GetPublicacionesByUser(idUser);
+        }
+
+        public void SaveOpcion(Opcion opcion)
+        {
+            _repo.SaveOpcion(opcion);
+        }
+
+        public void SaveCategory(Categoria categoria)
+        {
+            _repo.SaveCategory(categoria);
+        }
+
+        public IList<Categoria> GetCategories(Guid catagory)
+        {
+            return _repo.GetCategories(catagory);
         }
     }
 }

@@ -30,6 +30,10 @@ namespace FindFiddo.DataAccess
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
         #endregion
 
+        void SavePreferenciaForUser(Guid idUser, List<Opcion> opciones);
+
+        IList<Publicacion> GetMatchsForUser(Guid IdUser);
+
     }
     public class UserContext : IUserContext
     {
@@ -549,6 +553,58 @@ namespace FindFiddo.DataAccess
             {
                 _conn.Close();
             }
+        }
+
+        public void SavePreferenciaForUser(Guid idUser, List<Opcion> opciones)
+        {
+            SqlTransaction transaction = null;
+
+            try
+            {
+                _conn.Open();
+                transaction = _conn.BeginTransaction();
+
+                using (SqlCommand cmd = new SqlCommand("org_Add_preferencias_user", _conn, transaction))//crear stored
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                   
+                    cmd.Parameters.AddWithValue("@idUser", idUser);
+
+                    foreach (Opcion op in opciones)
+                    {
+                        cmd.Parameters["@idOpcion"].Value = op.Id;
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch (Exception)
+            {
+
+                transaction?.Rollback();
+                throw; 
+            }
+            finally
+            {
+                _conn.Close();
+            }
+        }
+
+        public IList<Publicacion> GetMatchsForUser(Guid IdUser)
+        {
+            //consulta para stored procedure 
+            /*
+              SELECT p.id_publicacion, p.titulo, p.descripcion, p.historia, p.ubicacion, p.fecha_alta
+              FROM publicacion p
+              JOIN publicacion_opciones po ON p.id_publicacion = po.id_publicacion
+              JOIN usuario_preferencias up ON po.id_opcion = up.id_opcion
+              WHERE up.id_usuario = @idUsuario
+              AND p.deleted = 0;
+            */
+            IList<Publicacion> list = null;
+            return list;
         }
     }
 }

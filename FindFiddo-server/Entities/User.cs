@@ -1,4 +1,5 @@
 ﻿using FindFiddo.Abstractions;
+using FindFiddo_server.Entities;
 
 namespace FindFiddo.Entities
 {
@@ -28,6 +29,8 @@ namespace FindFiddo.Entities
         public byte[]? salt { get; set; }
         public string? DV { get; set; }
         public Guid? idioma_preferido { get; set; }
+
+        public List<Opcion> preferencias { get; set; }
         public User() { }
     }
 

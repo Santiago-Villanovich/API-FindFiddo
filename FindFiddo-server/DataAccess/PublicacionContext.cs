@@ -1,4 +1,5 @@
-﻿using FindFiddo_server.Entities;
+﻿using FindFiddo.Entities;
+using FindFiddo_server.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data.SqlClient;
 
@@ -9,6 +10,13 @@ namespace FindFiddo_server.DataAccess
         void SavePublicacion(Publicacion publicacion);
         IList<Publicacion> GetPublicacionesByUser(Guid idUser);
         IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
+
+       
+
+        void SaveOpcion(Opcion opcion);
+
+        void SaveCategory(Categoria categoria);
+        IList<Categoria> GetCategories(Guid catagory);
     }
     public class PublicacionContext:IPublicacionContext
     {
@@ -140,6 +148,162 @@ namespace FindFiddo_server.DataAccess
             }
             finally { _conn.Close(); }
             
+        }
+
+        public void SaveOpcion(Opcion opcion)
+        {
+          
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("pub_SaveOpcion", _conn);//Crear Script
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                if (opcion.Id == Guid.Empty)
+                {
+                    opcion.Id = Guid.NewGuid();
+                }
+
+                cmd.Parameters.AddWithValue("@id", opcion.Id);
+                cmd.Parameters.AddWithValue("@nombre", opcion.nombre);
+               
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public void SaveOpcionForCategory(Opcion opcion,Guid category)
+        {
+
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("pub_SaveOpcion", _conn);//Crear Script
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                if (opcion.Id == Guid.Empty)
+                {
+                    opcion.Id = Guid.NewGuid();
+                }
+
+                cmd.Parameters.AddWithValue("@id", opcion.Id);
+                cmd.Parameters.AddWithValue("@nombre", opcion.nombre);
+                cmd.Parameters.AddWithValue("@categoria_id", category);
+
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+        public void SaveCategory(Categoria categoria)
+        {
+            bool isNew = false;
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("pub_SaveCategoria", _conn);//crear Script
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                if (categoria.Id == Guid.Empty)
+                {
+                    categoria.Id = Guid.NewGuid();
+                    isNew = true;
+                }
+
+                cmd.Parameters.AddWithValue("@categoria_id", categoria.Id);
+                cmd.Parameters.AddWithValue("@categoria_nombre", categoria.nombre);
+                if (categoria.opciones.Count > 0) 
+                {
+                    foreach (Opcion op in categoria.opciones)
+                    {
+                        if (op.Id == Guid.Empty)
+                        {
+                            op.Id = Guid.NewGuid();
+
+                        }
+                        SaveOpcionForCategory(op, categoria.Id);
+                    }
+                }
+                
+               
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public IList<Categoria> GetCategories(Guid catagory)
+        {
+            try
+            {
+                IList<Categoria> categorias = new List<Categoria>();
+
+                using (SqlCommand cmd = new SqlCommand("pub_GetAllCategorias", _conn))
+                {
+                    _conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        Categoria currentCategoria = null;
+
+                        while (reader.Read())
+                        {
+                            Guid id = reader.GetGuid(reader.GetOrdinal("id_publicacion"));
+                            currentCategoria = categorias.FirstOrDefault(c => c.Id.Equals(id));
+
+                            if (currentCategoria == null)
+                            {
+
+                                currentCategoria = new Categoria
+                                {
+                                    Id = id,
+                                    nombre = reader.GetString(reader.GetOrdinal("categoria_nombre")),
+                                    opciones = new List<Opcion>() 
+                                };
+
+                                categorias.Add(currentCategoria); 
+                            }
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("opcion_id")))
+                            {
+                                Opcion op = new Opcion
+                                (
+                                    reader.GetGuid(reader.GetOrdinal("opcion_id")),
+                                    reader.GetString(reader.GetOrdinal("opcion_nombre"))
+                                );
+
+                                currentCategoria.opciones.Add(op);
+                            }
+                        }
+                    }
+                }
+
+                return categorias;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
         }
     }
 }

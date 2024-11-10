@@ -489,7 +489,7 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("organizacion/XML")]
-        public IActionResult Importar_XML(string xml)
+        public IActionResult Importar_XML([FromBody] string xml)
         {
             try
             {
@@ -541,5 +541,110 @@ namespace FindFiddo_Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("user/preferencias")]
+        public IActionResult SavePreferenciasForUser(Guid User,[FromBody] List<Opcion> op)
+        {
+            try
+            {
+                if (op == null)
+                    return BadRequest("La opcion no puede ser nula");
+                if (User == Guid.Empty)
+                    return BadRequest("Se necesita un id de ususario");
+
+                _user.SavePreferenciaForUser(User, op);
+                return Ok("Preferencias de ususario guardada maquina");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("preferencias/save")]
+        public IActionResult SavePreferencias([FromBody] Opcion op)
+        {
+            try
+            {
+                if (op == null)
+                    return BadRequest("La opcion no puede ser nula");
+                
+
+                _publicacion.SaveOpcion(op);
+                return Ok("Opcion guardada maquina");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //hacer context
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("user/match")]
+        public IActionResult getMatchsForUser(Guid idUser)
+        {
+            try
+            {
+                if (idUser == Guid.Empty)
+                    return BadRequest("Necesito un id de usuario mi rey");
+
+                var all = _user.GetMatchsForUser(idUser);
+                return Ok(all);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("categorias")]
+        public IActionResult GetCategories(Guid categoria)
+        {
+            try
+            {
+
+                var all = _publicacion.GetCategories(categoria);
+                return Ok(all);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("categorias/save")]
+        public IActionResult SaveCategory([FromBody] Categoria categoria)
+        {
+            try
+            {
+                if (categoria == null)
+                    return BadRequest("La categoria no puede ser nula");
+
+
+                _publicacion.SaveCategory(categoria);
+                return Ok("Opcion guardada maquina");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
