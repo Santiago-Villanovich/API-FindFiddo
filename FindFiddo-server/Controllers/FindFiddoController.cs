@@ -315,16 +315,19 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("organizaciones")]
-        public IActionResult GetAllOrganizaciones(string? idUser)
+        public IActionResult GetAllOrganizaciones(string? idUser,string idOrg)
         {
             try
             {
-                Guid id = Guid.Empty;
-                
-                if(!String.IsNullOrEmpty(idUser))
-                    id = Guid.Parse(idUser);
+                Guid user = Guid.Empty;
+                Guid org = Guid.Empty;
 
-                var all = _user.GetAllOrganizaciones(id);
+                if (!String.IsNullOrEmpty(idUser))
+                    user = Guid.Parse(idUser);
+                if (!String.IsNullOrEmpty(idOrg))
+                    org = Guid.Parse(idOrg);
+
+                var all = _user.GetAllOrganizaciones(user,org);
                 return Ok(all);
 
             }
@@ -334,7 +337,7 @@ namespace FindFiddo_Server.Controllers
             }
         }
 
-        [AllowAnonymous]
+        /*[AllowAnonymous]
         [HttpGet]
         [Route("organizaciones/{id}")]
         public IActionResult GetOrganizacionById(Guid id)
@@ -348,7 +351,7 @@ namespace FindFiddo_Server.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
+        }*/
 
         [AllowAnonymous]
         [HttpPost]
@@ -505,7 +508,7 @@ namespace FindFiddo_Server.Controllers
         {
             try
             {
-                Organizacion org = _user.getOrganizacionByID(Id_organizacion);
+                Organizacion org = _user.GetAllOrganizaciones(Guid.Empty,Id_organizacion).FirstOrDefault();
 
                 string xml = XMLservice.generateXML(org);
                 return Ok(xml);

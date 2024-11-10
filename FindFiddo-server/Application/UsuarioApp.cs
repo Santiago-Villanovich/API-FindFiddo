@@ -16,8 +16,8 @@ namespace FindFiddo.Application
 
         Organizacion SaveOrganizacion(Organizacion organizacion);
         void DeleteOrganizacion(Guid id_organizacion);
-        IList<Organizacion> GetAllOrganizaciones(Guid idUser);
-        Organizacion getOrganizacionByID(Guid id);
+        IList<Organizacion> GetAllOrganizaciones(Guid idUser, Guid idOrg);
+        //Organizacion getOrganizacionByID(Guid id);
 
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
@@ -101,15 +101,15 @@ namespace FindFiddo.Application
             _repo.DeleteOrganizacion(id_organizacion);
         }
 
-        public IList<Organizacion> GetAllOrganizaciones(Guid idUser)
+        public IList<Organizacion> GetAllOrganizaciones(Guid idUser, Guid idOrg)
         {
-            return _repo.GetAllOrganizaciones(idUser);
+            return _repo.GetAllOrganizaciones(idUser, idOrg);
         }
 
-        public Organizacion getOrganizacionByID(Guid id)
+        /*public Organizacion getOrganizacionByID(Guid id)
         {
             return _repo.getOrganizacionByID(id);
-        }
+        }*/
 
         public void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
         {

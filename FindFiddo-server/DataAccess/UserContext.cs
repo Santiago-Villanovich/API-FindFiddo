@@ -24,8 +24,8 @@ namespace FindFiddo.DataAccess
         #region(organizacion)
         Organizacion SaveOrganizacion(Organizacion organizacion);
         void DeleteOrganizacion(Guid id_organizacion);
-        IList<Organizacion> GetAllOrganizaciones(Guid idUser);
-        Organizacion getOrganizacionByID(Guid id);
+        IList<Organizacion> GetAllOrganizaciones(Guid idUser, Guid idOrg);
+        //Organizacion getOrganizacionByID(Guid id);
         void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
         void Desasignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion);
         #endregion
@@ -423,7 +423,7 @@ namespace FindFiddo.DataAccess
             }
         }
 
-        public IList<Organizacion> GetAllOrganizaciones(Guid idUser)
+        public IList<Organizacion> GetAllOrganizaciones(Guid idUser,Guid idOrg)
         {
             List<Organizacion> list = new List<Organizacion>();
             try
@@ -434,6 +434,7 @@ namespace FindFiddo.DataAccess
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@idUser", !(idUser == Guid.Empty) ? idUser : DBNull.Value);
+                cmd.Parameters.AddWithValue("@idOrg", !(idOrg == Guid.Empty) ? idOrg: DBNull.Value);
 
 
                 _conn.Open();
@@ -465,7 +466,7 @@ namespace FindFiddo.DataAccess
             finally { _conn.Close(); }
         }
 
-        public Organizacion getOrganizacionByID(Guid id)
+        /*public Organizacion getOrganizacionByID(Guid id)
         {
             List<Organizacion> list = new List<Organizacion>();
             try
@@ -505,7 +506,7 @@ namespace FindFiddo.DataAccess
                 throw;
             }
             finally { _conn.Close(); }
-        }
+        }*/
 
         public void Asignar_Usuario_Organizacion(Guid Id_ususario, Guid Id_organizacion)
         {
