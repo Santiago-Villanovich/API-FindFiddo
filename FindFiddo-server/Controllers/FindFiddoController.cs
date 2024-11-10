@@ -420,6 +420,37 @@ namespace FindFiddo_Server.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost]
+        [Route("idiomas/{idioma}/traducciones/import")]
+        public async Task<IActionResult> SaveIdiomaTraduccionesXML(Guid idioma, IFormFile xmlFile)
+        {
+            if (xmlFile == null || xmlFile.Length == 0)
+            {
+                return BadRequest("Archivo XML no proporcionado o vacío.");
+            }
+
+            try
+            {
+                // Leer el contenido del archivo XML y convertirlo a una cadena
+                string xmlContent;
+                using (var stream = new StreamReader(xmlFile.OpenReadStream()))
+                {
+                    xmlContent = await stream.ReadToEndAsync();
+                }
+
+                // Deserializar el XML en objetos de traducción
+                var traducciones = XMLservice.DeserializarTraduccionXML(xmlContent);
+                var all = _translate.SaveTraducciones(traducciones, new Idioma() { Id = idioma });
+
+                return Ok(all);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
         [HttpGet]
         [Route("idiomas/terminos")]
         public IActionResult GetAllTerminos()
@@ -604,7 +635,6 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [ApiExplorerSettings(GroupName = "Categorias")]
         [Route("categorias")]
         public IActionResult SaveCategoria([FromBody] Categoria categoria)
         {

@@ -41,5 +41,14 @@ namespace FindFiddo_server.Services
                 return (Organizacion)serializer.Deserialize(memoryStream);
             }
         }
+
+        public static List<Traduccion> DeserializarTraduccionXML(string xml)
+        {
+            using (MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<Traduccion>));
+                return (List<Traduccion>)serializer.Deserialize(memoryStream);
+            }
+        }
     }
 }
