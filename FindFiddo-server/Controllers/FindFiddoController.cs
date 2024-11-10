@@ -315,7 +315,7 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("organizaciones")]
-        public IActionResult GetAllOrganizaciones(string? idUser,string idOrg)
+        public IActionResult GetAllOrganizaciones(string? idUser,string? idOrg)
         {
             try
             {
@@ -551,6 +551,23 @@ namespace FindFiddo_Server.Controllers
             
                 _publicacion.SavePublicacion(publi);
                 return Ok("Publicacion guardada maquina");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("publicaciones/tipos")]
+        public IActionResult GetAllPublicacionTipos()
+        {
+            try
+            {
+                var all = _publicacion.GetAllTipos();
+                return Ok(all);
 
             }
             catch (Exception ex)

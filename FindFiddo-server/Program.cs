@@ -30,6 +30,8 @@ builder.Services.AddScoped<IPublicacionApp, PublicacionApp>();
 builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
 builder.Services.AddScoped<IPublicacionContext, PublicacionContext>();
 
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -10,10 +10,14 @@ namespace FindFiddo_server.Entities
 {
     public class Organizacion : Entity, IVerificable
     {
+        [VerificableProperty]
         public string nombre { get; set; }
+        [VerificableProperty]
         public string razon_social { get; set; }
+        [VerificableProperty]
         public string direccion { get; set; }
+        [VerificableProperty]
         public int codigo_postal { get; set; }
-        public string DV { get; set; }
+        public string? DV { get; set; }
     }
 }

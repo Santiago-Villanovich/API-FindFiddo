@@ -19,16 +19,16 @@ namespace FindFiddo_server.DataAccess
     {
         
         private SqlConnection _conn;
-        private readonly IConfiguration _config;
+        //private readonly IConfiguration _config;
         public TranslatorContext(IConfiguration configuration)
         {
-            _config = configuration;
-            _conn = new SqlConnection(_config.GetConnectionString("default"));
+            //_config = configuration;
+            _conn = new SqlConnection(configuration.GetConnectionString("default"));
         }
 
         public Idioma GetIdiomaDefault()
         {
-            using (SqlConnection conn = _conn)
+            using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
             {
                 IDataReader reader = null;
                 Idioma _idioma = null;
@@ -69,7 +69,7 @@ namespace FindFiddo_server.DataAccess
 
         public List<Idioma> GetAllIdiomas()
         {
-            using (SqlConnection conn = _conn)
+            using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
             {
                 IDataReader reader = null;
                 List<Idioma> _idiomas = new List<Idioma>();
@@ -196,7 +196,7 @@ namespace FindFiddo_server.DataAccess
 
         public bool SaveIdioma(Idioma idioma)
         {
-            using (SqlConnection conn = _conn)
+            using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
             {
 
                 if (idioma.Id == Guid.Empty)
@@ -230,9 +230,8 @@ namespace FindFiddo_server.DataAccess
 
         public bool SaveTraduccion(Traduccion traduc, Idioma idioma)
         {
-            using (SqlConnection conn = _conn)
+            using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
             {
-                conn.Open();
 
                 try
                 {
@@ -243,6 +242,7 @@ namespace FindFiddo_server.DataAccess
                     cmd.Parameters.AddWithValue("@IdTermino", traduc.termino.Id);
                     cmd.Parameters.AddWithValue("@Traduccion", traduc.texto);
 
+                    conn.Open();
                     cmd.ExecuteNonQuery();
 
                     return true;

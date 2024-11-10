@@ -5,12 +5,14 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Data.SqlClient;
 using System.Reflection.PortableExecutable;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FindFiddo_server.DataAccess
 {
     public interface IPublicacionContext
     {
         void SavePublicacion(Publicacion publicacion);
+        IList<TipoPublicacion> GetAllTipos();
         IList<Publicacion> GetPublicacionesByUser(Guid idUser);
         IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
 
@@ -267,6 +269,40 @@ namespace FindFiddo_server.DataAccess
                             if (op != null)
                                 cat.opciones.Add(op);
                         }
+                    }
+                }
+
+                return categorias;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
+        }
+
+        public IList<TipoPublicacion> GetAllTipos()
+        {
+            try
+            {
+                IList<TipoPublicacion> categorias = new List<TipoPublicacion>();
+
+                using (SqlCommand cmd = new SqlCommand("pub_GetAllTipos", _conn))
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    _conn.Open();
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    TipoPublicacion tipo = null;
+
+                    while (reader.Read())
+                    {
+                        tipo = new TipoPublicacion(
+                            reader.GetGuid(reader.GetOrdinal("id_tipo")),
+                            reader.GetString(reader.GetOrdinal("descripcion"))
+                        );
+
+                        categorias.Add(tipo);   
                     }
                 }
 

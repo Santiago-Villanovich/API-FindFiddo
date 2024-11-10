@@ -7,6 +7,7 @@ namespace FindFiddo_server.Application
     public interface IPublicacionApp
     {
         void SavePublicacion(Publicacion publicacion);
+        IList<TipoPublicacion> GetAllTipos();
         IList<Publicacion> GetPublicacionesByUser(Guid idUser);
         IList<Publicacion> GetPublicaciones(DateTime from, DateTime to, string tipo, int pag);
 
@@ -66,6 +67,11 @@ namespace FindFiddo_server.Application
         public IList<Categoria> GetAllcategorias(string nombre)
         {
             return _repo.GetAllcategorias(nombre);
+        }
+
+        public IList<TipoPublicacion> GetAllTipos()
+        {
+            return _repo.GetAllTipos();
         }
     }
 }
