@@ -486,7 +486,7 @@ namespace FindFiddo.DataAccess
                 {
                     org = new Organizacion()
                     {
-                        Id = reader.GetGuid("id_org"),
+                        Id = reader.GetGuid("id_organizacion"),
                         nombre = reader.GetString("nombre"),
                         razon_social = reader.GetString("razon_social"),
                         direccion = reader.GetString("direccion"),
@@ -607,10 +607,10 @@ namespace FindFiddo.DataAccess
             IList<Publicacion> Publicaciones = new List<Publicacion>();
             try
             {
-                using SqlCommand cmd = new SqlCommand("get_publicacion_match", _conn);//hacer script
+                using SqlCommand cmd = new SqlCommand("get_matchs_user", _conn);
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id", IdUser);
+                cmd.Parameters.AddWithValue("@id_user", IdUser);
 
 
                 _conn.Open();

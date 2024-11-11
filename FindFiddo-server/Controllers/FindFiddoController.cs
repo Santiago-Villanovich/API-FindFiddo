@@ -617,7 +617,7 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("user/match")]
+        [Route("user/match")]//probar
         public IActionResult getMatchsForUser(Guid idUser)
         {
             try
@@ -695,5 +695,70 @@ namespace FindFiddo_Server.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("publicacion/like")]//funca bien
+        public IActionResult like_publicacion(Guid id_user,Guid id_publicacion)
+        {
+            try
+            {
+                if (id_user == Guid.Empty)
+                    return BadRequest("Necesito un id de ususario");
+                if (id_publicacion == Guid.Empty)
+                    return BadRequest("Necesito un id de publicacion");
+
+
+                _publicacion.like_publicacion(id_user,id_publicacion);
+                return Ok("Publicacion matcheada, like guardado");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("publicacion/dislike")]//probar
+        public IActionResult dislike_publicacion(Guid id_user, Guid id_publicacion)
+        {
+            try
+            {
+                if (id_user == Guid.Empty)
+                    return BadRequest("Necesito un id de ususario");
+                if (id_publicacion == Guid.Empty)
+                    return BadRequest("Necesito un id de publicacion");
+
+
+                _publicacion.Dislike_publicacion(id_user,id_publicacion);
+                return Ok("Dislike guardado");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("user/like")]//funca bien
+        public IActionResult GetLikesForUser(Guid Id_user)
+        {
+            try
+            {
+                if (Id_user == Guid.Empty)
+                    return BadRequest("Necesito un id de usuario rey");
+
+                var all = _publicacion.get_matchs(Id_user);
+                return Ok(all);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

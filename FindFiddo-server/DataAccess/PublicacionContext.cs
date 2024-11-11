@@ -19,6 +19,11 @@ namespace FindFiddo_server.DataAccess
         void DeleteCategoria(Guid idCategoria);
         Categoria SaveCategoria(Categoria categoria);
         IList<Categoria> GetAllcategorias(string nombre);
+
+        void Dislike_publicacion(Guid id_user, Guid id_publicacion);
+        void like_publicacion(Guid id_user, Guid id_publicacion);
+
+        IList<Publicacion> get_matchs(Guid id_user);
     }
     public class PublicacionContext:IPublicacionContext
     {
@@ -273,6 +278,109 @@ namespace FindFiddo_server.DataAccess
                 }
 
                 return categorias;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { _conn.Close(); }
+        }
+
+        public void Dislike_publicacion(Guid id_user, Guid id_publicacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("save_match", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                
+         
+                Guid Id_match = Guid.NewGuid();
+                cmd.Parameters.AddWithValue("@user_id", id_user);
+                cmd.Parameters.AddWithValue("@id_publicacion",id_publicacion );
+                cmd.Parameters.AddWithValue("@estado", "dislike");
+                cmd.Parameters.AddWithValue("@id_match",Id_match);
+                cmd.Parameters.AddWithValue("@fecha", DateTime.Now);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public void like_publicacion(Guid id_user, Guid id_publicacion)
+        {
+            try
+            {
+                using SqlCommand cmd = new SqlCommand("save_match", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+
+                Guid Id_match = Guid.NewGuid();
+                cmd.Parameters.AddWithValue("@user_id", id_user);
+                cmd.Parameters.AddWithValue("@id_publicacion", id_publicacion);
+                cmd.Parameters.AddWithValue("@estado", "like");
+                cmd.Parameters.AddWithValue("@id_match", Id_match);
+                cmd.Parameters.AddWithValue("@fecha", DateTime.Now);
+
+                _conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            { _conn.Close(); }
+        }
+
+        public IList<Publicacion> get_matchs(Guid id_user)
+        {
+            try
+            {
+                IList<Publicacion> Publicaciones = new List<Publicacion>();
+
+                using SqlCommand cmd = new SqlCommand("get_like_user", _conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_user", id_user);
+
+                _conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+               
+                while (reader.Read())
+                {
+                    Publicacion publi = new Publicacion();
+                    publi.Id = reader.GetGuid(reader.GetOrdinal("id_publicacion"));
+
+
+                   
+                        publi.tipo = new TipoPublicacion(
+                            reader.GetGuid(reader.GetOrdinal("id_tipo")),
+                            reader.GetString(reader.GetOrdinal("tipo_descripcion"))
+                        );
+
+                    publi.titulo = reader.IsDBNull(reader.GetOrdinal("titulo")) ? null : reader.GetString(reader.GetOrdinal("titulo"));
+                    publi.descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? null : reader.GetString(reader.GetOrdinal("descripcion"));
+                    publi.historia = reader.IsDBNull(reader.GetOrdinal("historia")) ? null : reader.GetString(reader.GetOrdinal("historia"));
+                    publi.ubicacion = reader.IsDBNull(reader.GetOrdinal("ubicacion")) ? null : reader.GetString(reader.GetOrdinal("ubicacion"));
+                    publi.fechaCreacion = reader.IsDBNull(reader.GetOrdinal("fecha_creacion")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("fecha_creacion"));
+
+
+
+
+                    Publicaciones.Add(publi);
+                    
+                   
+                }
+
+                return Publicaciones;
             }
             catch (Exception)
             {

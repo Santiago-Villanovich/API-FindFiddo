@@ -13,6 +13,11 @@ namespace FindFiddo_server.Repository
         void DeleteCategoria(Guid idCategoria);
         Categoria SaveCategoria(Categoria categoria);
         IList<Categoria> GetAllcategorias(string nombre);
+
+        void Dislike_publicacion(Guid id_user, Guid id_publicacion);
+        void like_publicacion(Guid id_user, Guid id_publicacion);
+
+        IList<Publicacion> get_matchs(Guid id_user);
     }
     public class PublicacionRepository:IPublicacionRepository
     {
@@ -65,6 +70,21 @@ namespace FindFiddo_server.Repository
         public IList<Categoria> GetAllcategorias(string nombre)
         {
             return _ctx.GetAllcategorias(nombre);
+        }
+
+        public void Dislike_publicacion(Guid id_user, Guid id_publicacion)
+        {
+            _ctx.Dislike_publicacion(id_user, id_publicacion);
+        }
+
+        public void like_publicacion(Guid id_user, Guid id_publicacion)
+        {
+            _ctx.like_publicacion(id_user,id_publicacion);  
+        }
+
+        public IList<Publicacion> get_matchs(Guid id_user)
+        {
+           return _ctx.get_matchs(id_user);
         }
 
         public IList<TipoPublicacion> GetAllTipos()
