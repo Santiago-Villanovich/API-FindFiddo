@@ -1,15 +1,15 @@
 ﻿USE [master]
 GO
-/****** Object:  Database [FindFiddo_App]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Database [FindFiddo_App]    Script Date: 12/11/2024 18:51:07 ******/
 CREATE DATABASE [FindFiddo_App]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'FindFiddo_App', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER86\MSSQL\DATA\FindFiddo_App.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'FindFiddo_App', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\FindFiddo_App.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'FindFiddo_App_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER86\MSSQL\DATA\FindFiddo_App_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
- WITH CATALOG_COLLATION = DATABASE_DEFAULT
+( NAME = N'FindFiddo_App_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\FindFiddo_App_log.ldf' , SIZE = 73728KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
 GO
-ALTER DATABASE [FindFiddo_App] SET COMPATIBILITY_LEVEL = 150
+ALTER DATABASE [FindFiddo_App] SET COMPATIBILITY_LEVEL = 160
 GO
 IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
 begin
@@ -76,13 +76,15 @@ ALTER DATABASE [FindFiddo_App] SET DELAYED_DURABILITY = DISABLED
 GO
 ALTER DATABASE [FindFiddo_App] SET ACCELERATED_DATABASE_RECOVERY = OFF  
 GO
+EXEC sys.sp_db_vardecimal_storage_format N'FindFiddo_App', N'ON'
+GO
 ALTER DATABASE [FindFiddo_App] SET QUERY_STORE = ON
 GO
 ALTER DATABASE [FindFiddo_App] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
 GO
 USE [FindFiddo_App]
 GO
-/****** Object:  UserDefinedFunction [dbo].[DesencriptarDato]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  UserDefinedFunction [dbo].[DesencriptarDato]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -95,7 +97,7 @@ BEGIN
     RETURN DECRYPTBYPASSPHRASE('Fiddo12345', @dato);
 END;
 GO
-/****** Object:  UserDefinedFunction [dbo].[EncriptarDato]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  UserDefinedFunction [dbo].[EncriptarDato]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -108,7 +110,7 @@ BEGIN
     RETURN ENCRYPTBYPASSPHRASE('Fiddo12345', @dato);
 END;
 GO
-/****** Object:  Table [dbo].[archivos]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[archivos]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -126,7 +128,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[categorias]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[categorias]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -141,7 +143,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[idiomas]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[idiomas]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -155,7 +157,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[log_usuario]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[log_usuario]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -167,7 +169,7 @@ CREATE TABLE [dbo].[log_usuario](
 	[fecha] [varbinary](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[log_usuario_publicaciones]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[log_usuario_publicaciones]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -185,7 +187,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[match]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[match]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -194,7 +196,7 @@ CREATE TABLE [dbo].[match](
 	[id_match] [uniqueidentifier] NOT NULL,
 	[id_publicacion] [uniqueidentifier] NULL,
 	[id_usuario] [uniqueidentifier] NULL,
-	[estado] [nvarchar](50) NULL,
+	[estado] [nvarchar](1) NULL,
 	[timestamp] [datetime] NULL,
 PRIMARY KEY CLUSTERED 
 (
@@ -202,7 +204,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[mirror_usuario]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[mirror_usuario]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -225,7 +227,7 @@ CREATE TABLE [dbo].[mirror_usuario](
 	[action_type] [nvarchar](50) NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[opciones]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[opciones]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -241,7 +243,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[organizacion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[organizacion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -261,7 +263,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[organizacion_usuario]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[organizacion_usuario]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -271,7 +273,7 @@ CREATE TABLE [dbo].[organizacion_usuario](
 	[id_usuario] [uniqueidentifier] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[publicacion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[publicacion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -292,7 +294,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[publicacion_opciones]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[publicacion_opciones]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -302,7 +304,7 @@ CREATE TABLE [dbo].[publicacion_opciones](
 	[id_opcion] [uniqueidentifier] NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[publicacion_tipos]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[publicacion_tipos]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -316,7 +318,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[rol]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[rol]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -330,7 +332,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tablas_dv]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[tablas_dv]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -344,7 +346,7 @@ CREATE TABLE [dbo].[tablas_dv](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[terminos]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[terminos]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -358,7 +360,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[traduccion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[traduccion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -366,10 +368,10 @@ GO
 CREATE TABLE [dbo].[traduccion](
 	[id_idioma] [uniqueidentifier] NULL,
 	[id_termino] [uniqueidentifier] NULL,
-	[traduccion] [nvarchar](1) NULL
-) ON [PRIMARY]
+	[traduccion] [nvarchar](max) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[usuario]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[usuario]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -397,7 +399,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[usuario_preferencias]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[usuario_preferencias]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -407,7 +409,7 @@ CREATE TABLE [dbo].[usuario_preferencias](
 	[id_opcion] [uniqueidentifier] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[usuario_rol]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  Table [dbo].[usuario_rol]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -443,11 +445,11 @@ INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N
 INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-3c69-3922-7f8f-533e3ea74fb6', 0x020000009D00FE89617730ACBCE0FE5A505549BD920D0B02C110822385C98DBBC1A0FA4F09130AC253973436B21CC6C2681BC3D36E5CBB0C52077E1BC73321D3FF25118523DB73925A546538E24D256227717AFDB2649BE51DC01ACF98CEEA5403F5080891C8354CF7040C92EEB7B411483828EF, 0x020000001A3B85FAFC37BDA0DC8EDDA6890D9F38911CB862FFF1D75FE4E3DD1362AC6DEBEF93D7BC9BD00BA388C008A7FCBA72CF, 0x020000004406948347C257F84C896DFAADE25D02A002DAB78D398899C7C7DB221332D0380690FBE9C3334014AEFFC52C510DF3FE7468B89B7E0117BD8AC3AFB082328E92)
 INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-734b-aa88-2927-d8415c4fe0cd', 0x0200000034395DB272403C2ACE4CBD45CC0576B35333D176B2711361AF277F9BC67DA4BC21E765CB1E15CFB5507B30A13D15B1AA4F54D352ED5EB51D9DF0A9E3887A41AE85609B0E21BFDD3D3164CBFE586E939D9968DBA502CF72A340F0455336DDFB0BAAC55FADBCE1E1A4BA99B28D61C89151, 0x0200000055C613C4D969855B950AC0C238D29A73E9FE51AE44FB48C1061D89A5D3F2E7498185857F01051A58D506905113E278DE, 0x020000009C0A58934D22F64DEC3B54F9BF2E482A2042096AD98594BF0CF3541893AAB06BEA1CECDFAB49B38CA5B70E52F505A819EA09EEA56258D531AEF590137C6FC911)
 INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-6d11-aa96-8c66-292d7bed70be', 0x020000001CE9D5DDED895F221BF3470B11921F3F02E50E744B4A2EA6C7F2E8C4A410C581C3AB068380E235351CD48521E38298F5AA79F9C5DF0D269584DB09EF20D179CA8A90EB67698C271B748FAB13117D36F7E049A4802388F76FA788A5C79B8699B38EA54420049381FE3D785815CBB0A79A, 0x02000000614BEFF08648B4E0DF8ED1915F520A393442A2D0340CE41A6ED27B658A53B56C1754CEB696299503354CB75F8CDE89C1, 0x020000003241915BA29C2A48C604B419210DC2213F2A373FD16C76A648359D06D16250F57CECFED663A94664BAEF11C2B50FDE6409555F368437620DA9186F8D4879BD85)
+INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-2640-3a39-02de-9ddc915fe889', 0x02000000CBEBBC09471B888D53B51A7FEFDBE4DFD49BD2D7325F20A8BCF86DA390BF84F6FDEE58FF9AAFB1DBFAF97CF047B29DBD7B9DC00B0182ECAD28283CF00FBF8136D6E56D2B7650230EC9FBD52EC499F317D51CEE988487E9ACCB617B2849CB8FB58C2315718D5A1E9BF08C0CDA62B735F6, 0x0200000085E81F5502D4F00D178D2E42CDDD668275CC0E6BD27FF2884437CD5FBBF595DE9CCA6A43D3940F75218DEC68CAEFCB95, 0x02000000A6E9889732BFAE71A4BF7932AC97EA9557D87D1E613E3D4DE9456AD95140C3EA9F6A5273B28A08C0F7435BADEF4B8A04FF0682EB33D2BADD1FB1039DFABF0A2B)
+INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-d458-bcfd-4ad0-4cda45c6db37', 0x020000001B467B795D3F9E24B56009E5D89CD5B218F14923B7F956DA346A195596E6E9B0806865DAB3121FE23BF41CD84FA8C19C24FC4895F74B64C156C6F6C8CCF7601BB3A7EF7B2A846B15B286175883D2C60470EAA43BD467D8B2F0A9F4C68AEC92B26A18FF772239659AA2D49DF02F8F67EF, 0x0200000010991F83D6ECEA95A2837115C94D529959C30D9E1731507A39659DE46A15D42E90C924A4B9E629110474367E43DD938E, 0x02000000D9163E751E53E83DB980BDE9BD7A5BDA534886E781B14C7791D3155F509AF9B6FC4D4EF20DD560AC71B5660890456C5BCC0FDB7E2E856C299B4E2BF163C532C7)
 INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-cfc7-fc9c-504e-ad0fcbd06519', 0x02000000843183A1DCC738B4F55EE6E8197222D5F5073879E5EF226218820FC6C4A4F48D62B42A35A7C55757AAC0234B768D1DF108CD739228961CB0FC5DDA881FF5B93ADA649250EFD769A3E61204EF2C55AF1716D64F83E4A1D8E1F63BA252E4EF2224DFAA7770B226BA153C82ED6D4F617ECD, 0x020000009E351899C238EA81F3CE03E513B86AC6A0549B926B6C4E9FBAB2E1F5ECF108E3695A825D5C454DB96C383C0C6BBF5C69, 0x020000005E3B73CB84DDFEAEAD29B88C39E6F2320023DE1A559A6DDF834CC21FDE70FADFBD2538767EB775D56FD5BE90E8D8118B037D9C07C5E6F06D38D5410FC0C57D6D)
 INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-cb0b-48f2-c9a9-3e74656064b5', 0x02000000B484315CA7CA3732CA6D103A38914728D59D71797046CB029AEFC6F32D587D1AFB25F4187268313371E02605E9BFF8E05B4E3F2F179454350363619E8F6785318595A16D75471CB06FA4E39E5EEBAEA9386C7341A5EE4EA2145424DF1E89EFB4EBBF69CD095C1A018E950B2A980DC07D, 0x02000000C10AD869387DB14A9C888E592B1ED238765874CCF940089BA29376CCA3B99B3FF9926778CEA0848F27689F8DA03A00E5, 0x0200000078E930E263033C999EE5FDA46ABD5BD9667918B5ED6025733C255C7A30937FF326C42C9507D15F234AED06EDF0EF275CAADDF50F8CFC208F3BB6AEBFA3F34C7A)
 INSERT [dbo].[log_usuario] ([id_log], [id_usuario], [accion], [fecha]) VALUES (N'00000002-02c8-32c2-dd93-0e0dea8c232a', 0x02000000A33F15B2D5AA815B74C2EB6DE3C350A27C1132D8BC845197AD07D5CA5FD69A5279288959A7530E8D055A1DA8A6523ABC430E5DCADA91003A21C675740190C382714F057CDB98943834CD527ACC4AEBC807B00C41C15C7A5C2C67A2F0D6DF79711CF42E9C6A05916762AD832038BAC18E, 0x02000000B1DB768CFFB755FB3AC0B66B36F119E6EE365FAE7F8BC30D4A15BDE467BB5EDB1EAAABE8B3797B4775638EEA9D85A903, 0x020000003D90DD2F5FB167EB9F4315BF4D53A7994E96D83D38438F8A5529722280BC156BD0602F098C958A39E5415877E222764104E1E52653BCCDC8C05FA9E5CAB2A9DA)
-GO
-INSERT [dbo].[match] ([id_match], [id_publicacion], [id_usuario], [estado], [timestamp]) VALUES (N'c5f3eca6-4e6c-4449-ad93-d346391f6f47', N'6f0b406e-771e-4ef1-9578-a9301b313cee', N'30396bdd-7f0f-4b45-955c-7d77347b9ec9', N'like', CAST(N'2024-11-10T00:00:00.000' AS DateTime))
 GO
 INSERT [dbo].[mirror_usuario] ([id_usuario], [nombres], [apellidos], [dni], [email], [telefono], [clave], [fecha_nacimiento], [direccion], [codigo_postal], [dv], [fecha_creacion], [salt], [deleted], [action_type]) VALUES (N'd4d03654-9efe-484b-9b55-3758d50a68df', N'a', N'p', N'122112123', N'prueba@gmail.com', N'1212121', N'QnykniBs27kFbIRq1vC0qbS9BThUVLjMJkaZ6YOs5LR4NmrcF8nloJ/6YPDNxLXT', CAST(N'2024-07-02T18:38:44.797' AS DateTime), N'nkjsandkjsan', 1221, N'bHYudHVasx3xkv6UVMrrQQ==', CAST(N'2024-07-02T15:40:18.250' AS DateTime), 0x427CA49E206CDBB9056C846AD6F0B4A9, 0, N'Modified')
 GO
@@ -476,9 +478,10 @@ INSERT [dbo].[opciones] ([id_opcion], [id_categoria], [nombre], [deleted]) VALUE
 INSERT [dbo].[opciones] ([id_opcion], [id_categoria], [nombre], [deleted]) VALUES (N'9858e256-9d24-42d0-bf42-f1cdedc8f003', N'71fa28cb-62f8-40a0-9a48-9240a0af7221', N'Chihuahua', 0)
 INSERT [dbo].[opciones] ([id_opcion], [id_categoria], [nombre], [deleted]) VALUES (N'557f40a0-8e99-4b6a-a20f-fbc0df4823a0', N'71fa28cb-62f8-40a0-9a48-9240a0af7221', N'Akita Inu', 0)
 GO
-INSERT [dbo].[organizacion] ([id_organizacion], [nombre], [razon_social], [direccion], [codigo_postal], [digito_verificador], [fecha_creacion], [deleted]) VALUES (N'90611c06-b1ad-4689-bf30-1793ffbe0427', N'Org de prueba', N'macanudo', N'desconocida', 1714, N'1', CAST(N'2024-10-11T00:00:00.000' AS DateTime), 0)
+INSERT [dbo].[organizacion] ([id_organizacion], [nombre], [razon_social], [direccion], [codigo_postal], [digito_verificador], [fecha_creacion], [deleted]) VALUES (N'b34a7d3d-1c31-44ed-aa79-80b7d358488f', N'Traverso prueba', N'1122122323', N'Jose Maria Paz 332', 1715, N'13V9V1nqBXo9xAqI1AbLEA==', CAST(N'2024-11-10T18:09:53.950' AS DateTime), 0)
+INSERT [dbo].[organizacion] ([id_organizacion], [nombre], [razon_social], [direccion], [codigo_postal], [digito_verificador], [fecha_creacion], [deleted]) VALUES (N'a6bd624b-51e1-4694-81cb-b0ec26aaec27', N'Cachorritos org', N'3332332333', N'Brandsen 1721', 1432, N'wqkJyz2WECaPfnTQ7jhCxA==', CAST(N'2024-11-10T18:16:20.067' AS DateTime), 0)
 GO
-INSERT [dbo].[publicacion] ([id_publicacion], [id_usuario], [id_tipo], [titulo], [descripcion], [historia], [ubicacion], [fecha_creacion], [deleted]) VALUES (N'6f0b406e-771e-4ef1-9578-a9301b313cee', N'46625f0d-cb78-43cc-8327-35dcd26326cf', N'61d50007-7d29-4489-8cfb-2f315b5e4c03', N'perro facha', NULL, NULL, N'el hood', CAST(N'2024-11-10T20:55:44.067' AS DateTime), 0)
+INSERT [dbo].[organizacion_usuario] ([id_organizacion], [id_usuario]) VALUES (N'b34a7d3d-1c31-44ed-aa79-80b7d358488f', N'7c08c969-f7ce-4d8a-a51c-6f648304c3fa')
 GO
 INSERT [dbo].[publicacion_tipos] ([id_tipo], [descripcion]) VALUES (N'61d50007-7d29-4489-8cfb-2f315b5e4c03', N'Adopcion')
 INSERT [dbo].[publicacion_tipos] ([id_tipo], [descripcion]) VALUES (N'3623964e-d8e3-4e30-837d-693fe2a2131f', N'Perdido')
@@ -494,6 +497,11 @@ INSERT [dbo].[terminos] ([id_termino], [descripcion]) VALUES (N'fc088916-7420-42
 INSERT [dbo].[terminos] ([id_termino], [descripcion]) VALUES (N'd72c2d7e-7402-4e9d-9850-c2b37e518ece', N'bienvenido')
 INSERT [dbo].[terminos] ([id_termino], [descripcion]) VALUES (N'e5055c05-fc1f-47ae-83c7-c9775adcfad2', N'ingresar')
 INSERT [dbo].[terminos] ([id_termino], [descripcion]) VALUES (N'3a44c350-006a-4a55-a491-cbf374b07da6', N'configuracion')
+GO
+INSERT [dbo].[traduccion] ([id_idioma], [id_termino], [traduccion]) VALUES (N'0dac9c9c-b1c3-4ff5-9b85-595427e6210c', N'53e988d3-161b-40c6-ac66-075eaea55734', N'Publicar')
+INSERT [dbo].[traduccion] ([id_idioma], [id_termino], [traduccion]) VALUES (N'0dac9c9c-b1c3-4ff5-9b85-595427e6210c', N'fc088916-7420-421a-ada3-6a778cc6f2fb', N'Cerrar Sesion')
+INSERT [dbo].[traduccion] ([id_idioma], [id_termino], [traduccion]) VALUES (N'0dac9c9c-b1c3-4ff5-9b85-595427e6210c', N'd72c2d7e-7402-4e9d-9850-c2b37e518ece', N'Bienvenido')
+INSERT [dbo].[traduccion] ([id_idioma], [id_termino], [traduccion]) VALUES (N'0dac9c9c-b1c3-4ff5-9b85-595427e6210c', N'e5055c05-fc1f-47ae-83c7-c9775adcfad2', N'Ingresar')
 GO
 INSERT [dbo].[usuario] ([id_usuario], [nombres], [apellidos], [dni], [email], [telefono], [clave], [fecha_nacimiento], [direccion], [codigo_postal], [dv], [fecha_creacion], [salt], [deleted], [verified], [id_idioma]) VALUES (N'46625f0d-cb78-43cc-8327-35dcd26326cf', N'juanca x3', N'perez', N'112233', N'perez@gamil.com', N'1211212121', N'UTfZhgCIgkfmxq0NeSGMbKaZl7NT4C9yf8tisOoHF+MS3HZkxlZuBmAJi2kHYjJX', CAST(N'2024-06-29T22:27:33.183' AS DateTime), N'sdjnskjdn', 11222, N'9FqpF/F/BG+l0JLuQjJiXQ==', CAST(N'2024-06-29T19:28:16.757' AS DateTime), 0x5137D98600888247E6C6AD0D79218C6C, 0, NULL, NULL)
 INSERT [dbo].[usuario] ([id_usuario], [nombres], [apellidos], [dni], [email], [telefono], [clave], [fecha_nacimiento], [direccion], [codigo_postal], [dv], [fecha_creacion], [salt], [deleted], [verified], [id_idioma]) VALUES (N'd4d03654-9efe-484b-9b55-3758d50a68df', N'', N'', N'', N'prueba@gmail.com', N'1212121', N'QnykniBs27kFbIRq1vC0qbS9BThUVLjMJkaZ6YOs5LR4NmrcF8nloJ/6YPDNxLXT', CAST(N'2024-07-02T18:38:44.797' AS DateTime), N'nkjsandkjsan', 1221, N'bHYudHVasx3xkv6UVMrrQQ==', CAST(N'2024-07-02T15:40:18.250' AS DateTime), 0x427CA49E206CDBB9056C846AD6F0B4A9, 0, NULL, NULL)
@@ -512,7 +520,7 @@ INSERT [dbo].[usuario_rol] ([id_rol], [id_usuario]) VALUES (N'47066668-03b1-4510
 INSERT [dbo].[usuario_rol] ([id_rol], [id_usuario]) VALUES (N'47066668-03b1-4510-9d0d-ab466c550c68', N'76fc82b5-9623-4afb-85c7-ecbedf6d4cff')
 INSERT [dbo].[usuario_rol] ([id_rol], [id_usuario]) VALUES (N'05953c7e-3250-49b5-89c3-3c44c2d46a83', N'30396bdd-7f0f-4b45-955c-7d77347b9ec9')
 GO
-/****** Object:  StoredProcedure [dbo].[bak_CreateBackup]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[bak_CreateBackup]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -559,7 +567,7 @@ BEGIN
     END CATCH
 END
 GO
-/****** Object:  StoredProcedure [dbo].[cat_DeleteCategoria]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[cat_DeleteCategoria]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -578,7 +586,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[cat_GetAllCategorias]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[cat_GetAllCategorias]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -600,7 +608,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[cat_SaveCategoria]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[cat_SaveCategoria]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -625,7 +633,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[cat_SaveCategoriaOpcion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[cat_SaveCategoriaOpcion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -651,7 +659,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[dvf_GetDVbyName]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[dvf_GetDVbyName]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -668,7 +676,7 @@ BEGIN
     SELECT DV FROM tablas_dv WHERE nombre_tabla = @tNombre
 END
 GO
-/****** Object:  StoredProcedure [dbo].[dvf_UpdateTableDV]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[dvf_UpdateTableDV]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -696,16 +704,11 @@ BEGIN
 	END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[get_like_user]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[get_like_user]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[get_like_user]
 	-- Add the parameters for the stored procedure here
 	@id_user uniqueidentifier
@@ -719,7 +722,7 @@ BEGIN
 	where p.deleted='0' and m.estado='like' and m.id_usuario=@id_user
 END
 GO
-/****** Object:  StoredProcedure [dbo].[get_matchs_user]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[get_matchs_user]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -745,7 +748,7 @@ BEGIN
 	  AND m.id_publicacion IS NULL;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[get_organizacion_by_id]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[get_organizacion_by_id]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -771,32 +774,9 @@ BEGIN
 	from organizacion o
 	where deleted = 0 and (@id is null or id_organizacion = @id)
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[get_publicacion_match_for_user]    Script Date: 12/11/2024 11:53:50 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
-CREATE PROCEDURE [dbo].[get_publicacion_match_for_user]
-	-- Add the parameters for the stored procedure here
-	@id_user uniqueidentifier
-AS
-BEGIN
-	SELECT p.id_publicacion, p.titulo, p.descripcion, p.historia, p.ubicacion 
-	FROM publicacion p
-inner join publicacion_tipos pt on pt.id_tipo=p.id_tipo
-inner	JOIN publicacion_opciones po ON p.id_publicacion = po.id_publicacion
-inner	JOIN usuario_preferencias up ON po.id_opcion = up.id_opcion
-	WHERE up.id_usuario = @id_user and pt.descripcion='Adopcion'
-	AND p.deleted = 0;
-END
-GO
-/****** Object:  StoredProcedure [dbo].[lng_GetAllIdiomas]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[lng_GetAllIdiomas]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -809,7 +789,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[lng_GetAllTerminos]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[lng_GetAllTerminos]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -823,7 +803,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[lng_GetAllTraducciones]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[lng_GetAllTraducciones]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -839,7 +819,7 @@ BEGIN
 	where tt.id_idioma = @idIdioma
 END
 GO
-/****** Object:  StoredProcedure [dbo].[lng_SaveIdioma]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[lng_SaveIdioma]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -876,7 +856,7 @@ else
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[lng_SaveTraduccion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[lng_SaveTraduccion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -903,7 +883,7 @@ else
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[log_GetUserFiltered]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[log_GetUserFiltered]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -945,7 +925,7 @@ begin
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[mrr_delete]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[mrr_delete]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -961,7 +941,7 @@ BEGIN
     DELETE FROM mirror_usuario
 END
 GO
-/****** Object:  StoredProcedure [dbo].[mrr_GetIntegrityAnomalies]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[mrr_GetIntegrityAnomalies]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1008,7 +988,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[org_Add_organizacion_user]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[org_Add_organizacion_user]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1025,7 +1005,7 @@ BEGIN
 	end 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[org_Delete_organizacion_user]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[org_Delete_organizacion_user]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1042,7 +1022,7 @@ BEGIN
 	end 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[org_DeleteOrganizacion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[org_DeleteOrganizacion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1056,13 +1036,14 @@ BEGIN
 	where id_organizacion = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[org_GetAllOrganizaciones]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[org_GetAllOrganizaciones]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[org_GetAllOrganizaciones]
-	@idUser uniqueidentifier
+	@idUser uniqueidentifier,
+	@idOrg uniqueidentifier
 AS
 BEGIN
 	select 
@@ -1074,11 +1055,13 @@ BEGIN
 		o.digito_verificador,
 		o.fecha_creacion
 	from organizacion o
-	inner join organizacion_usuario ou on ou.id_organizacion = o.id_organizacion
-	where deleted = 0 and (@idUser is null or ou.id_usuario = @idUser)
+	left join organizacion_usuario ou on ou.id_organizacion = o.id_organizacion
+	where deleted = 0 
+	and (@idUser is null or ou.id_usuario = @idUser)
+	and (@idOrg is null or o.id_organizacion = @idOrg)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[org_SaveOrganizacion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[org_SaveOrganizacion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1110,7 +1093,7 @@ BEGIN
 		end
 END
 GO
-/****** Object:  StoredProcedure [dbo].[pub_GetAllPublicacionByUser]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[pub_GetAllPublicacionByUser]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1140,7 +1123,19 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[pub_SavePublicacion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[pub_GetAllTipos]    Script Date: 12/11/2024 18:51:07 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[pub_GetAllTipos]
+AS
+BEGIN
+	select * 
+	from publicacion_tipos
+END
+GO
+/****** Object:  StoredProcedure [dbo].[pub_SavePublicacion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1172,7 +1167,7 @@ BEGIN
 	end
 END
 GO
-/****** Object:  StoredProcedure [dbo].[pub_SavePublicacionOpcion]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[pub_SavePublicacionOpcion]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1190,7 +1185,7 @@ BEGIN
 	end
 END
 GO
-/****** Object:  StoredProcedure [dbo].[save_match]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[save_match]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1214,8 +1209,9 @@ BEGIN
 	insert into [dbo].[match](id_match,id_publicacion,id_usuario,estado,timestamp)
 	values(@id_match,@id_publicacion,@user_id,@estado,@fecha)
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[usr_DeleteUser]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_DeleteUser]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1234,7 +1230,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_GetAllUsers]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_GetAllUsers]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1252,7 +1248,7 @@ BEGIN
 	WHERE deleted = 0
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_GetById]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_GetById]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1272,7 +1268,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_GetUserByEmail]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_GetUserByEmail]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1307,7 +1303,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_GetUserRoles]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_GetUserRoles]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1329,7 +1325,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_InsertUser]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_InsertUser]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1400,7 +1396,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_InsertUserLog]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_InsertUserLog]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1420,7 +1416,7 @@ BEGIN
     );
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_SetUsuarioRol]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_SetUsuarioRol]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1441,7 +1437,7 @@ BEGIN
 	END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_UpdateUser]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_UpdateUser]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1468,7 +1464,7 @@ BEGIN
 	WHERE id_usuario = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usr_UpdateUserDV]    Script Date: 12/11/2024 11:53:50 ******/
+/****** Object:  StoredProcedure [dbo].[usr_UpdateUserDV]    Script Date: 12/11/2024 18:51:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
