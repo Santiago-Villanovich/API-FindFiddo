@@ -29,8 +29,11 @@ namespace FindFiddo_server.Services
         {
             get
             {
-                if (_session == null) _session = new SessionManager();
-
+                lock (_lock)
+                {
+                    if (_session == null)
+                        _session = new SessionManager();
+                }
                 return _session;
             }
         }
@@ -40,15 +43,12 @@ namespace FindFiddo_server.Services
 
             lock (_lock)
             {
-                if (_session != null)
+                if (_session == null)
                 {
-                    _session.usuario = usuario;
-                    _session.FechaInicio = DateTime.Now;
+                    _session = new SessionManager();
                 }
-                else
-                {
-                    throw new Exception("No hay sesion iniciada");
-                }
+                _session.usuario = usuario;
+                _session.FechaInicio = DateTime.Now;
             }
         }
       /*  public static bool recursiva(int id, IList<Componente> roles)
@@ -75,19 +75,11 @@ namespace FindFiddo_server.Services
         }*/
         public static void Logout()
         {
-            lock (_lock)
-            {
-                if (_session != null)
+           
+                lock (_lock)
                 {
                     _session = null;
                 }
-                else
-                {
-                    throw new Exception("Sesión no iniciada");
-                }
-            }
-
-
         }
 
         private SessionManager()
