@@ -30,7 +30,7 @@ namespace FindFiddo.Entities
         public string? DV { get; set; }
         public Guid? idioma_preferido { get; set; }
 
-        public List<Opcion> preferencias { get; set; }
+        public List<Opcion>? preferencias { get; set; }
         public User() { }
     }
 
