@@ -154,6 +154,23 @@ namespace FindFiddo_Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
+        [Route("user")]
+        public IActionResult GetAllUsers()
+        {
+            try
+            {
+                var all = _user.GetAll();
+                var users = all.Select(u => new LogedUser(u.Id,u.telefono,u.email,u.nombres,u.apellidos));
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
         [Route("data/status")]
         public IActionResult validateDataBaseState()
         {
