@@ -10,7 +10,7 @@ namespace FindFiddo_server.DataAccess
         List<Idioma> GetAllIdiomas();
         List<Termino> GetAllTerminos();
         bool SaveTraduccion(Traduccion traduc, Idioma idioma);
-        IDictionary<string, TraduccionDTO> GetAllTraducciones(Guid idioma);
+        IDictionary<string, TraduccionDTO> GetAllTraducciones(string idioma, string pag);
 
         Idioma GetIdiomaDefault();  
  
@@ -107,7 +107,7 @@ namespace FindFiddo_server.DataAccess
             }
         }
 
-        public IDictionary<string, TraduccionDTO> GetAllTraducciones(Guid idioma)
+        public IDictionary<string, TraduccionDTO> GetAllTraducciones(string idioma, string pag)
         {
 
             using (SqlConnection conn = new SqlConnection(_conn.ConnectionString))
@@ -119,7 +119,8 @@ namespace FindFiddo_server.DataAccess
 
                     SqlCommand cmd = new SqlCommand("lng_GetAllTraducciones", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@idIdioma", idioma);
+                    cmd.Parameters.AddWithValue("@codIdioma", idioma);
+                    cmd.Parameters.AddWithValue("@codPagina", !string.IsNullOrEmpty(pag)? pag : (object)DBNull.Value );
                     conn.Open();
 
                     reader = cmd.ExecuteReader();
@@ -174,7 +175,8 @@ namespace FindFiddo_server.DataAccess
                         _lista.Add(new Termino()
                         {
                             Id = Guid.Parse(reader["id_termino"].ToString()),
-                            termino = reader["descripcion"].ToString()
+                            termino = reader["descripcion"].ToString(),
+                            codigoPagina = reader.GetString(reader.GetOrdinal("cod_pagina"))
 
                         });
                     }
@@ -208,6 +210,7 @@ namespace FindFiddo_server.DataAccess
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id", idioma.Id);
                 cmd.Parameters.AddWithValue("@descripcion", idioma.descripcion);
+                cmd.Parameters.AddWithValue("@codigo", idioma.codigo);
                 cmd.Connection = conn;
                 conn.Open();
 

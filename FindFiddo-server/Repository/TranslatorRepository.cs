@@ -9,7 +9,7 @@ namespace FindFiddo_server.Repository
     {
         Idioma GetIdiomaDefault();
         List<Idioma> GetAllIdiomas();
-        IDictionary<string, TraduccionDTO> GetAllTraducciones(Guid idIdioma);
+        IDictionary<string, TraduccionDTO> GetAllTraducciones(string idioma, string pag);
         List<Termino> GetAllTerminos();
         bool SaveIdioma(Idioma idioma);
         bool SaveTraducciones(List<Traduccion> traducciones, Idioma idioma);
@@ -48,11 +48,11 @@ namespace FindFiddo_server.Repository
             }
         }
 
-        public IDictionary<string, TraduccionDTO> GetAllTraducciones(Guid idioma)
+        public IDictionary<string, TraduccionDTO> GetAllTraducciones(string idioma, string pag)
         {
             try
             {
-                return _ctx.GetAllTraducciones(idioma);
+                return _ctx.GetAllTraducciones(idioma,pag);
             }
             catch (Exception)
             {

@@ -407,11 +407,11 @@ namespace FindFiddo_Server.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("idiomas/{idioma}/traducciones")]
-        public IActionResult GetIdiomaTraducciones(Guid idioma)
+        public IActionResult GetIdiomaTraducciones(string idioma, string? pag)
         {
             try
             {
-                var all = _translate.GetAllTraducciones(idioma);
+                var all = _translate.GetAllTraducciones(idioma,pag);
                 return Ok(all);
             }
             catch (Exception ex)

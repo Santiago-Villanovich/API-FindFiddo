@@ -4,13 +4,15 @@ namespace FindFiddo_server.Entities
 {
     public class Publicacion:Entity
     {
-        public User usuario { get; set; }
+        public string id_usuario { get; set; }
         public TipoPublicacion tipo { get; set; }
         public List<Opcion>? opciones { get; set; }
         public string titulo { get; set; }
         public string descripcion { get; set; }
         public string  historia { get; set; }
         public string ubicacion { get; set; }
+
+        public Publicacion() { }
 
     }
 
@@ -25,5 +27,6 @@ namespace FindFiddo_server.Entities
             this.Id = id;
             this.nombre = nombre;
         }
+        public TipoPublicacion() { }
     }
 }

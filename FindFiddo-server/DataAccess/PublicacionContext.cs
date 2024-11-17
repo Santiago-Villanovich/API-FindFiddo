@@ -50,7 +50,7 @@ namespace FindFiddo_server.DataAccess
                 }
                     
                 cmd.Parameters.AddWithValue("@id", publicacion.Id);
-                cmd.Parameters.AddWithValue("@idUser", publicacion.usuario.Id);
+                cmd.Parameters.AddWithValue("@idUser", publicacion.id_usuario);
                 cmd.Parameters.AddWithValue("@idTipo", publicacion.tipo.Id);
                 cmd.Parameters.AddWithValue("@titulo", publicacion.titulo);
                 cmd.Parameters.AddWithValue("@historia", publicacion.historia);
